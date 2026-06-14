@@ -1,0 +1,112 @@
+<p-toast />
+
+<div class="register-wrapper">
+  <div class="register-bg">
+    <div class="bg-pattern"></div>
+  </div>
+
+  <div class="register-container">
+    <div class="register-card">
+      <div class="register-logo">
+        <div class="logo-circle">
+          <i class="pi pi-user-plus"></i>
+        </div>
+        <h1>Crear cuenta</h1>
+        <p>Regístrate para acceder a los simulacros</p>
+      </div>
+
+      <form [formGroup]="form" (ngSubmit)="submit()" class="register-form">
+        <div class="grid">
+          <div class="col-12 md:col-6">
+            <div class="field">
+              <label>Nombre</label>
+              <input pInputText formControlName="firstName" placeholder="Juan" class="w-full" />
+              @if (f('firstName')?.invalid && f('firstName')?.touched) {
+                <small class="error-msg">Nombre requerido (mín. 2 caracteres)</small>
+              }
+            </div>
+          </div>
+          <div class="col-12 md:col-6">
+            <div class="field">
+              <label>Apellido</label>
+              <input pInputText formControlName="lastName" placeholder="Pérez" class="w-full" />
+              @if (f('lastName')?.invalid && f('lastName')?.touched) {
+                <small class="error-msg">Apellido requerido (mín. 2 caracteres)</small>
+              }
+            </div>
+          </div>
+          <div class="col-12">
+            <div class="field">
+              <label>Correo electrónico</label>
+              <input pInputText formControlName="email" type="email" placeholder="docente@ejemplo.com" class="w-full" />
+              @if (f('email')?.invalid && f('email')?.touched) {
+                <small class="error-msg">Correo electrónico inválido</small>
+              }
+            </div>
+          </div>
+          <div class="col-12 md:col-6">
+            <div class="field">
+              <label>DNI</label>
+              <input pInputText formControlName="dni" placeholder="12345678" class="w-full" maxlength="8" />
+              @if (f('dni')?.invalid && f('dni')?.touched) {
+                <small class="error-msg">DNI debe tener 8 dígitos</small>
+              }
+            </div>
+          </div>
+          <div class="col-12 md:col-6">
+            <div class="field">
+              <label>Teléfono</label>
+              <input pInputText formControlName="phone" placeholder="987654321" class="w-full" maxlength="9" />
+              @if (f('phone')?.invalid && f('phone')?.touched) {
+                <small class="error-msg">Teléfono debe tener 9 dígitos</small>
+              }
+            </div>
+          </div>
+          <div class="col-12 md:col-6">
+            <div class="field">
+              <label>Contraseña</label>
+              <p-password formControlName="password" placeholder="Mín. 8 caracteres" [toggleMask]="true" styleClass="w-full" inputStyleClass="w-full" />
+              @if (f('password')?.invalid && f('password')?.touched) {
+                <small class="error-msg">Contraseña mínimo 8 caracteres</small>
+              }
+            </div>
+          </div>
+          <div class="col-12 md:col-6">
+            <div class="field">
+              <label>Confirmar contraseña</label>
+              <p-password formControlName="confirmPassword" placeholder="Repite la contraseña" [toggleMask]="true" [feedback]="false" styleClass="w-full" inputStyleClass="w-full" />
+              @if (f('confirmPassword')?.errors?.['mismatch'] && f('confirmPassword')?.touched) {
+                <small class="error-msg">Las contraseñas no coinciden</small>
+              }
+            </div>
+          </div>
+          <div class="col-12 md:col-6">
+            <div class="field">
+              <label>Escala Magisterial</label>
+              <p-select formControlName="escalaMagisterial" [options]="escalaOptions" placeholder="Selecciona tu escala" styleClass="w-full" />
+              @if (f('escalaMagisterial')?.invalid && f('escalaMagisterial')?.touched) {
+                <small class="error-msg">Selecciona tu escala magisterial</small>
+              }
+            </div>
+          </div>
+          <div class="col-12 md:col-6">
+            <div class="field">
+              <label>Especialidad de Interés</label>
+              <p-select formControlName="specialtyInterest" [options]="specialtyOptions" placeholder="Selecciona especialidad" styleClass="w-full" />
+              @if (f('specialtyInterest')?.invalid && f('specialtyInterest')?.touched) {
+                <small class="error-msg">Selecciona una especialidad</small>
+              }
+            </div>
+          </div>
+        </div>
+
+        <button pButton type="submit" label="Crear cuenta" icon="pi pi-check" class="w-full register-btn" [loading]="loading"></button>
+      </form>
+
+      <div class="register-footer">
+        <span>¿Ya tienes cuenta?</span>
+        <a routerLink="/auth/login" class="login-link">Inicia sesión</a>
+      </div>
+    </div>
+  </div>
+</div>

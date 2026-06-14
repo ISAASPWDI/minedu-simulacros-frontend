@@ -1,0 +1,76 @@
+.profile-layout {
+  max-width: 860px;
+}
+
+.avatar-section {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  background: var(--surface-card);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+}
+
+.avatar-wrapper {
+  flex-shrink: 0;
+}
+
+.avatar-img {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #3b82f6;
+}
+
+.avatar-initials {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: white;
+}
+
+.avatar-info {
+  h2 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text-color);
+    margin-bottom: 0.25rem;
+  }
+
+  p {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+  }
+}
+
+.profile-form,
+.password-form {
+  padding-top: 1rem;
+}
+
+.field {
+  margin-bottom: 1.25rem;
+
+  label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text-muted);
+    margin-bottom: 0.5rem;
+  }
+}
+
+.form-actions {
+  padding-top: 0.5rem;
+  display: flex;
+  justify-content: flex-end;
+}

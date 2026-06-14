@@ -1,0 +1,42 @@
+<p-toast />
+<app-page-header title="Configuración del Sistema" [breadcrumb]="['Admin', 'Configuración']" />
+
+@if (loading()) {
+  <div class="config-list">
+    @for (i of [1,2,3,4,5]; track i) {
+      <div class="config-row">
+        <p-skeleton height="2rem" width="40%" />
+        <p-skeleton height="2rem" width="50%" />
+      </div>
+    }
+  </div>
+} @else {
+  <div class="config-list">
+    @for (config of configs(); track config.key) {
+      <div class="config-row">
+        <div class="config-key-block">
+          <div class="config-key">{{ config.key }}</div>
+          <div class="config-desc">{{ config.description }}</div>
+        </div>
+
+        @if (config.editing) {
+          <div class="config-edit-block">
+            <input
+              pInputText
+              [ngModel]="config.editValue"
+              (ngModelChange)="updateEditValue(config, $event)"
+              class="config-input"
+            />
+            <button pButton icon="pi pi-check" size="small" severity="success" [loading]="config.saving" (click)="saveConfig(config)"></button>
+            <button pButton icon="pi pi-times" size="small" severity="secondary" text (click)="cancelEdit(config)"></button>
+          </div>
+        } @else {
+          <div class="config-value-block">
+            <span class="config-value">{{ config.value }}</span>
+            <button pButton icon="pi pi-pencil" size="small" severity="secondary" text (click)="startEdit(config)"></button>
+          </div>
+        }
+      </div>
+    }
+  </div>
+}

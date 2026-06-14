@@ -1,0 +1,128 @@
+<p-toast />
+
+<app-page-header title="Seleccionar Examen" [breadcrumb]="['Inicio', 'Exámenes']" />
+
+<div class="filters-row">
+  <p-select
+    [options]="yearOptions"
+    [ngModel]="filterYear()"
+    (ngModelChange)="filterYear.set($event); onFilterChange()"
+    placeholder="Año"
+    styleClass="filter-dropdown"
+  />
+  <p-select
+    [options]="levelOptions"
+    [ngModel]="filterLevel()"
+    (ngModelChange)="filterLevel.set($event); onFilterChange()"
+    placeholder="Nivel"
+    styleClass="filter-dropdown"
+  />
+  <p-select
+    [options]="specialtyOptions"
+    [ngModel]="filterSpecialty()"
+    (ngModelChange)="filterSpecialty.set($event); onFilterChange()"
+    placeholder="Especialidad"
+    styleClass="filter-dropdown"
+  />
+</div>
+
+@if (!hasSubscription()) {
+  <div class="sub-warning">
+    <i class="pi pi-lock"></i>
+    <div>
+      <strong>Suscripción requerida</strong>
+      <p>Necesitas una suscripción activa para iniciar simulacros. <a routerLink="/teacher/subscription">Ver planes</a></p>
+    </div>
+  </div>
+}
+
+@if (loading()) {
+  <div class="grid mt-2">
+    @for (i of [1,2,3,4,5,6]; track i) {
+      <div class="col-12 md:col-6 lg:col-4">
+        <div class="exam-card-skeleton">
+          <p-skeleton height="120px" />
+        </div>
+      </div>
+    }
+  </div>
+} @else if (exams().length === 0) {
+  <div class="empty-state">
+    <i class="pi pi-search"></i>
+    <p>No se encontraron exámenes con los filtros seleccionados</p>
+  </div>
+} @else {
+  <div class="grid mt-2">
+    @for (exam of exams(); track exam.id) {
+      <div class="col-12 md:col-6 lg:col-4">
+        <div class="exam-card" [class.locked]="!hasSubscription()">
+          <div class="exam-card-header">
+            <div class="exam-code">{{ exam.code }}</div>
+            <p-tag [value]="exam.level | nivel" [severity]="exam.level === 'PRIMARIA' ? 'info' : 'warn'" />
+          </div>
+          <div class="exam-meta">
+            <div class="meta-item">
+              <i class="pi pi-calendar"></i>
+              <span>{{ exam.year }}</span>
+            </div>
+            <div class="meta-item">
+              <i class="pi pi-tag"></i>
+              <span>{{ exam.specialty }}</span>
+            </div>
+            <div class="meta-item">
+              <i class="pi pi-clock"></i>
+              <span>{{ exam.durationMinutes }} min</span>
+            </div>
+            <div class="meta-item">
+              <i class="pi pi-list"></i>
+              <span>{{ exam.totalQuestions }} preguntas</span>
+            </div>
+          </div>
+          <div class="exam-card-footer">
+            @if (!hasSubscription()) {
+              <div class="lock-overlay">
+                <i class="pi pi-lock"></i>
+                <span>Requiere suscripción</span>
+              </div>
+            } @else {
+              <button pButton label="Iniciar Simulacro" icon="pi pi-play" class="w-full" (click)="openExamDialog(exam)"></button>
+            }
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+}
+
+<p-dialog
+  header="Configurar Simulacro"
+  [visible]="showDialog()"
+  (visibleChange)="showDialog.set($event)"
+  [modal]="true"
+  [style]="{'width': '420px'}"
+  [closable]="true"
+>
+  @if (selectedExam()) {
+    <div class="dialog-exam-info">
+      <div class="exam-title">{{ selectedExam()!.code }} — {{ selectedExam()!.year }}</div>
+      <div class="exam-detail">{{ selectedExam()!.specialty }} | {{ selectedExam()!.level | nivel }}</div>
+      <div class="exam-detail">{{ selectedExam()!.totalQuestions }} preguntas · {{ selectedExam()!.durationMinutes }} minutos</div>
+    </div>
+
+    <div class="field mt-3">
+      <label>Selecciona tu Escala Magisterial</label>
+      <p-select
+        [options]="escalaOptions"
+        [ngModel]="selectedEscala()"
+        (ngModelChange)="selectedEscala.set($event)"
+        placeholder="¿En qué escala rindirás?"
+        styleClass="w-full"
+      />
+    </div>
+  }
+
+  <ng-template pTemplate="footer">
+    <button pButton label="Cancelar" severity="secondary" text (click)="showDialog.set(false)"></button>
+    <button pButton label="Iniciar" icon="pi pi-play" [disabled]="!selectedEscala()" [loading]="starting()" (click)="startSimulation()"></button>
+  </ng-template>
+</p-dialog>

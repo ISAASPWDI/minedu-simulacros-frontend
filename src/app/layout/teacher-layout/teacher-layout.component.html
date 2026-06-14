@@ -1,0 +1,66 @@
+<p-toast />
+<p-confirmDialog />
+
+<div class="layout-wrapper">
+  <aside class="layout-sidebar" [class.open]="sidebarOpen()">
+    <div class="sidebar-logo">
+      <div class="logo-icon">
+        <i class="pi pi-graduation-cap"></i>
+      </div>
+      <div class="logo-text">
+        <span class="logo-title">MINEDU</span>
+        <span class="logo-subtitle">Simulacros 2026</span>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      @for (item of navItems; track item.route) {
+        <a class="nav-item" [class.active]="isActive(item.route)" (click)="navigate(item.route)">
+          <i [class]="item.icon"></i>
+          <span>{{ item.label }}</span>
+        </a>
+      }
+    </nav>
+
+    @if (!hasActiveSubscription) {
+      <div class="subscription-banner">
+        <i class="pi pi-exclamation-triangle"></i>
+        <span>Sin suscripción activa</span>
+      </div>
+    }
+
+    <div class="sidebar-footer">
+      <div class="user-info">
+        <div class="user-avatar">{{ userInitials }}</div>
+        <div class="user-details">
+          <span class="user-name">{{ currentUser()?.firstName }} {{ currentUser()?.lastName }}</span>
+          <span class="user-role">Docente</span>
+        </div>
+      </div>
+      <button pButton icon="pi pi-sign-out" severity="secondary" text (click)="logout()" pTooltip="Cerrar sesión"></button>
+    </div>
+  </aside>
+
+  <div class="layout-main">
+    <header class="layout-topbar">
+      <button pButton icon="pi pi-bars" severity="secondary" text class="sidebar-toggle" (click)="toggleSidebar()"></button>
+      <div class="topbar-brand">Simulacros Docente</div>
+      <div class="topbar-spacer"></div>
+      <div class="topbar-user">
+        @if (subscription()?.active) {
+          <p-badge [value]="subscription()!.planName" severity="success" styleClass="plan-badge"></p-badge>
+        }
+        <div class="topbar-avatar">{{ userInitials }}</div>
+        <span class="topbar-username">{{ currentUser()?.firstName }}</span>
+      </div>
+    </header>
+
+    <main class="layout-content">
+      <router-outlet />
+    </main>
+  </div>
+</div>
+
+@if (sidebarOpen()) {
+  <div class="sidebar-overlay" (click)="toggleSidebar()"></div>
+}

@@ -1,0 +1,59 @@
+<p-toast />
+<app-page-header title="Gestión de Usuarios" [breadcrumb]="['Admin', 'Usuarios']" />
+
+<div class="users-card">
+  <p-table
+    [value]="users()"
+    [loading]="loading()"
+    [tableStyle]="{'min-width': '700px'}"
+    [paginator]="true"
+    [rows]="pageSize"
+    [totalRecords]="totalRecords()"
+    [lazy]="true"
+    (onLazyLoad)="onPageChange($event)"
+    styleClass="p-datatable-sm"
+  >
+    <ng-template pTemplate="header">
+      <tr>
+        <th>Nombre</th>
+        <th>Email</th>
+        <th>DNI</th>
+        <th>Rol</th>
+        <th>Escala</th>
+        <th>Estado</th>
+        <th>Acción</th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-user>
+      <tr>
+        <td>{{ user.firstName }} {{ user.lastName }}</td>
+        <td class="text-muted">{{ user.email }}</td>
+        <td>{{ user.dni }}</td>
+        <td>
+          <p-tag [value]="user.role" [severity]="getRoleSeverity(user.role)" />
+        </td>
+        <td>{{ user.profile?.escalaMagisterial | escala }}</td>
+        <td>
+          <p-tag [value]="user.active ? 'Activo' : 'Inactivo'" [severity]="user.active ? 'success' : 'secondary'" />
+        </td>
+        <td>
+          <button
+            pButton
+            [icon]="user.active ? 'pi pi-ban' : 'pi pi-check'"
+            [severity]="user.active ? 'danger' : 'success'"
+            size="small"
+            text
+            [loading]="toggling() === user.id"
+            (click)="toggleActive(user)"
+            [pTooltip]="user.active ? 'Desactivar' : 'Activar'"
+          ></button>
+        </td>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="7" class="text-center" style="padding:2rem;color:var(--text-muted)">No hay usuarios registrados</td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>

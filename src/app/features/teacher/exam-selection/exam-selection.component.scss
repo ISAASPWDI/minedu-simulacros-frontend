@@ -1,0 +1,154 @@
+.filters-row {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.5rem;
+
+  .filter-dropdown {
+    min-width: 180px;
+  }
+}
+
+.sub-warning {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  border-radius: 10px;
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.5rem;
+  color: #f59e0b;
+
+  i { font-size: 1.25rem; margin-top: 2px; }
+
+  p {
+    margin: 0.25rem 0 0;
+    font-size: 0.875rem;
+    color: #94a3b8;
+
+    a {
+      color: #f59e0b;
+      text-decoration: underline;
+    }
+  }
+
+  strong {
+    display: block;
+    font-size: 0.9rem;
+  }
+}
+
+.exam-card {
+  background: var(--surface-card);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 1.25rem;
+  transition: all 0.2s;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+
+  &:hover:not(.locked) {
+    border-color: #3b82f6;
+    box-shadow: 0 4px 16px rgba(59, 130, 246, 0.15);
+  }
+
+  &.locked {
+    opacity: 0.7;
+  }
+}
+
+.exam-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+
+  .exam-code {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text-color);
+    font-family: monospace;
+  }
+}
+
+.exam-meta {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+
+  .meta-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+
+    i { font-size: 0.75rem; width: 14px; }
+  }
+}
+
+.exam-card-footer {
+  .lock-overlay {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.625rem;
+    background: rgba(255,255,255,0.05);
+    border-radius: 8px;
+    color: var(--text-muted);
+    font-size: 0.8rem;
+  }
+}
+
+.exam-card-skeleton {
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding: 4rem 2rem;
+  color: var(--text-muted);
+
+  i { font-size: 3rem; opacity: 0.3; }
+  p { font-size: 0.9rem; }
+}
+
+.dialog-exam-info {
+  background: rgba(255,255,255,0.03);
+  border-radius: 8px;
+  padding: 1rem;
+
+  .exam-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text-color);
+    margin-bottom: 0.5rem;
+    font-family: monospace;
+  }
+
+  .exam-detail {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+  }
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+
+  label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text-color);
+  }
+}

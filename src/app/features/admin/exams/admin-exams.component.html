@@ -1,0 +1,138 @@
+<p-toast />
+<app-page-header title="Gestión de Exámenes" [breadcrumb]="['Admin', 'Exámenes']" />
+
+<div class="toolbar mb-3">
+  <button pButton label="Nuevo Examen" icon="pi pi-plus" (click)="showCreateDialog.set(true)"></button>
+</div>
+
+<div class="exams-card">
+  <p-table [value]="exams()" [loading]="loading()" [tableStyle]="{'min-width': '800px'}" styleClass="p-datatable-sm">
+    <ng-template pTemplate="header">
+      <tr>
+        <th>Código</th>
+        <th>Año</th>
+        <th>Nivel</th>
+        <th>Especialidad</th>
+        <th>Duración</th>
+        <th>Preguntas</th>
+        <th>Estado</th>
+        <th>Acciones</th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-exam>
+      <tr>
+        <td><strong>{{ exam.code }}</strong></td>
+        <td>{{ exam.year }}</td>
+        <td>{{ exam.level | nivel }}</td>
+        <td>{{ exam.specialty }}</td>
+        <td>{{ exam.durationMinutes }} min</td>
+        <td>{{ exam.totalQuestions }}</td>
+        <td>
+          <p-tag [value]="exam.active ? 'Activo' : 'Inactivo'" [severity]="exam.active ? 'success' : 'secondary'" />
+        </td>
+        <td>
+          <div class="action-row">
+            <button pButton icon="pi pi-upload" size="small" severity="info" text pTooltip="Cargar preguntas" (click)="openUpload(exam)"></button>
+            <button pButton icon="pi pi-clock" size="small" severity="secondary" text pTooltip="Cambiar duración" (click)="openDuration(exam)"></button>
+            <button pButton
+              [icon]="exam.active ? 'pi pi-eye-slash' : 'pi pi-eye'"
+              size="small"
+              [severity]="exam.active ? 'danger' : 'success'"
+              text
+              [loading]="toggling() === exam.id"
+              (click)="toggleActive(exam)"
+            ></button>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="8" class="text-center" style="padding:2rem;color:var(--text-muted)">No hay exámenes registrados</td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>
+
+<!-- Crear examen -->
+<p-dialog header="Nuevo Examen" [visible]="showCreateDialog()" (visibleChange)="showCreateDialog.set($event)" [modal]="true" [style]="{'width':'520px'}">
+  <form [formGroup]="createForm" class="create-form">
+    <div class="grid">
+      <div class="col-12 md:col-6">
+        <div class="field">
+          <label>Código</label>
+          <input pInputText formControlName="code" placeholder="EC-2024-A" class="w-full" />
+        </div>
+      </div>
+      <div class="col-12 md:col-6">
+        <div class="field">
+          <label>Año</label>
+          <input pInputText type="number" formControlName="year" class="w-full" />
+        </div>
+      </div>
+      <div class="col-12 md:col-6">
+        <div class="field">
+          <label>Nivel</label>
+          <p-select formControlName="level" [options]="levelOptions" styleClass="w-full" />
+        </div>
+      </div>
+      <div class="col-12 md:col-6">
+        <div class="field">
+          <label>Especialidad</label>
+          <p-select formControlName="specialty" [options]="specialtyOptions" placeholder="Seleccionar" styleClass="w-full" />
+        </div>
+      </div>
+      <div class="col-12 md:col-4">
+        <div class="field">
+          <label>Forma</label>
+          <input pInputText type="number" formControlName="forma" class="w-full" />
+        </div>
+      </div>
+      <div class="col-12 md:col-4">
+        <div class="field">
+          <label>Duración (min)</label>
+          <input pInputText type="number" formControlName="durationMinutes" class="w-full" />
+        </div>
+      </div>
+      <div class="col-12 md:col-4">
+        <div class="field">
+          <label>N° Preguntas</label>
+          <input pInputText type="number" formControlName="totalQuestions" class="w-full" />
+        </div>
+      </div>
+    </div>
+  </form>
+  <ng-template pTemplate="footer">
+    <button pButton label="Cancelar" severity="secondary" text (click)="showCreateDialog.set(false)"></button>
+    <button pButton label="Crear" icon="pi pi-check" [loading]="creating()" (click)="createExam()"></button>
+  </ng-template>
+</p-dialog>
+
+<!-- Cargar preguntas -->
+<p-dialog header="Cargar Preguntas (JSON)" [visible]="showUploadDialog()" (visibleChange)="showUploadDialog.set($event)" [modal]="true" [style]="{'width':'600px'}">
+  <div class="upload-hint">Pega el JSON con las preguntas. Cada pregunta debe tener: <code>number, text, optionA, optionB, optionC, correctAnswer</code></div>
+  <textarea
+    pInputText
+    class="w-full json-area"
+    rows="12"
+    placeholder='[{"number":1,"text":"Pregunta...","optionA":"A","optionB":"B","optionC":"C","correctAnswer":"A"}]'
+    [ngModel]="questionsJson()"
+    (ngModelChange)="questionsJson.set($event)"
+  ></textarea>
+  <ng-template pTemplate="footer">
+    <button pButton label="Cancelar" severity="secondary" text (click)="showUploadDialog.set(false)"></button>
+    <button pButton label="Cargar preguntas" icon="pi pi-upload" [loading]="uploading()" (click)="uploadQuestions()"></button>
+  </ng-template>
+</p-dialog>
+
+<!-- Cambiar duración -->
+<p-dialog header="Cambiar Duración" [visible]="showDurationDialog()" (visibleChange)="showDurationDialog.set($event)" [modal]="true" [style]="{'width':'360px'}">
+  <div class="field">
+    <label>Duración en minutos</label>
+    <input pInputText type="number" [ngModel]="newDuration()" (ngModelChange)="newDuration.set($event)" class="w-full" />
+  </div>
+  <ng-template pTemplate="footer">
+    <button pButton label="Cancelar" severity="secondary" text (click)="showDurationDialog.set(false)"></button>
+    <button pButton label="Guardar" icon="pi pi-save" [loading]="savingDuration()" (click)="saveDuration()"></button>
+  </ng-template>
+</p-dialog>

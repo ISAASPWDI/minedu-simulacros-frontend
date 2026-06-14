@@ -1,0 +1,62 @@
+.config-list {
+  background: var(--surface-card);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.config-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--border-color);
+
+  &:last-child { border-bottom: none; }
+
+  &:hover {
+    background: rgba(255,255,255,0.02);
+  }
+}
+
+.config-key-block {
+  flex: 0 0 320px;
+
+  .config-key {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-color);
+    font-family: monospace;
+  }
+
+  .config-desc {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin-top: 0.2rem;
+  }
+}
+
+.config-value-block {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+
+  .config-value {
+    font-size: 0.875rem;
+    color: var(--text-color);
+    flex: 1;
+    word-break: break-all;
+  }
+}
+
+.config-edit-block {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  .config-input {
+    flex: 1;
+  }
+}

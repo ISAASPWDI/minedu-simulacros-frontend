@@ -1,0 +1,163 @@
+.sidebar-logo {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1.25rem 1rem;
+  border-bottom: 1px solid var(--border-color);
+
+  .logo-icon {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.25rem;
+    flex-shrink: 0;
+  }
+
+  .logo-text {
+    display: flex;
+    flex-direction: column;
+
+    .logo-title {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--text-color);
+      letter-spacing: 0.05em;
+    }
+
+    .logo-subtitle {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+    }
+  }
+}
+
+.sidebar-nav {
+  flex: 1;
+  padding: 0.75rem 0;
+  overflow-y: auto;
+}
+
+.sidebar-footer {
+  border-top: 1px solid var(--border-color);
+  padding: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  .user-info {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-width: 0;
+  }
+
+  .user-avatar {
+    width: 36px;
+    height: 36px;
+    background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: white;
+    flex-shrink: 0;
+  }
+
+  .user-details {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+
+    .user-name {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-color);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .user-role {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+    }
+  }
+}
+
+.topbar-brand {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-color);
+}
+
+.topbar-spacer {
+  flex: 1;
+}
+
+.topbar-user {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+
+  .topbar-avatar {
+    width: 36px;
+    height: 36px;
+    background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: white;
+  }
+
+  .topbar-username {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text-color);
+  }
+}
+
+.sidebar-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+  display: none;
+
+  @media (max-width: 768px) {
+    display: block;
+  }
+}
+
+.sidebar-toggle {
+  @media (min-width: 769px) {
+    display: none !important;
+  }
+}
+
+:host {
+  @media (max-width: 768px) {
+    .layout-sidebar {
+      position: fixed;
+      left: -260px;
+      z-index: 1000;
+      top: 0;
+      bottom: 0;
+      transition: left 0.3s ease;
+
+      &.open {
+        left: 0;
+      }
+    }
+  }
+}

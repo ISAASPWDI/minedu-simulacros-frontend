@@ -1,0 +1,100 @@
+<p-toast />
+<p-confirmDialog />
+
+@if (loading()) {
+  <div class="sim-loading">
+    <i class="pi pi-spin pi-spinner" style="font-size: 3rem; color: #3b82f6;"></i>
+    <p>Cargando examen...</p>
+  </div>
+} @else {
+  <div class="sim-wrapper">
+    <div class="sim-header">
+      <div class="sim-title">Simulacro en Curso</div>
+      <div class="sim-progress">
+        <span class="answered-count">{{ answeredCount() }} / {{ questions().length }} respondidas</span>
+        <p-progressBar [value]="progressValue()" [showValue]="false" styleClass="sim-progress-bar" />
+      </div>
+      <div class="timer-box">
+        <i class="pi pi-clock"></i>
+        <span class="timer-display" [class]="timerClass()">{{ timerDisplay() }}</span>
+      </div>
+      <button pButton label="Finalizar" icon="pi pi-flag" severity="danger" (click)="confirmFinish()" class="finish-btn"></button>
+    </div>
+
+    <div class="sim-body">
+      <aside class="sim-nav" [class.collapsed]="!navExpanded()">
+        <div class="nav-header">
+          <span>Mapa de preguntas</span>
+          <button pButton icon="pi pi-chevron-left" severity="secondary" text size="small" (click)="navExpanded.set(!navExpanded())"></button>
+        </div>
+        @if (navExpanded()) {
+          <div class="question-nav-grid">
+            @for (q of questions(); track q.id; let i = $index) {
+              <button
+                class="q-btn"
+                [class.answered]="q.answered"
+                [class.current]="i === currentIndex()"
+                [class.unanswered]="!q.answered && i !== currentIndex()"
+                (click)="goToQuestion(i)"
+              >{{ q.number }}</button>
+            }
+          </div>
+          <div class="nav-legend">
+            <div class="legend-item"><span class="legend-dot unanswered"></span> Sin responder</div>
+            <div class="legend-item"><span class="legend-dot answered"></span> Respondida</div>
+            <div class="legend-item"><span class="legend-dot current"></span> Actual</div>
+          </div>
+        }
+      </aside>
+
+      <main class="sim-main">
+        @if (currentQuestion()) {
+          @if (currentQuestion()!.groupContextText) {
+            <div class="context-panel">
+              <div class="context-label">Texto de contexto</div>
+              <p>{{ currentQuestion()!.groupContextText }}</p>
+            </div>
+          }
+
+          <div class="question-panel">
+            <div class="question-number">Pregunta {{ currentQuestion()!.number }}</div>
+            <div class="question-text">{{ currentQuestion()!.text }}</div>
+
+            <div class="options-list">
+              <div
+                class="option-card"
+                [class.selected]="currentQuestion()!.selectedAnswer === 'A'"
+                (click)="selectAnswer('A')"
+              >
+                <div class="option-letter">A</div>
+                <div class="option-text">{{ currentQuestion()!.optionA }}</div>
+              </div>
+              <div
+                class="option-card"
+                [class.selected]="currentQuestion()!.selectedAnswer === 'B'"
+                (click)="selectAnswer('B')"
+              >
+                <div class="option-letter">B</div>
+                <div class="option-text">{{ currentQuestion()!.optionB }}</div>
+              </div>
+              <div
+                class="option-card"
+                [class.selected]="currentQuestion()!.selectedAnswer === 'C'"
+                (click)="selectAnswer('C')"
+              >
+                <div class="option-letter">C</div>
+                <div class="option-text">{{ currentQuestion()!.optionC }}</div>
+              </div>
+            </div>
+
+            <div class="nav-buttons">
+              <button pButton label="Anterior" icon="pi pi-chevron-left" severity="secondary" [disabled]="currentIndex() === 0" (click)="prevQuestion()"></button>
+              <span class="question-counter">{{ currentIndex() + 1 }} / {{ questions().length }}</span>
+              <button pButton label="Siguiente" iconPos="right" icon="pi pi-chevron-right" severity="secondary" [disabled]="currentIndex() === questions().length - 1" (click)="nextQuestion()"></button>
+            </div>
+          </div>
+        }
+      </main>
+    </div>
+  </div>
+}

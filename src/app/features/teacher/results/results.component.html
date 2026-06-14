@@ -1,0 +1,102 @@
+@if (loading()) {
+  <div class="results-loading">
+    <i class="pi pi-spin pi-spinner" style="font-size:3rem; color:#3b82f6;"></i>
+    <p>Cargando resultados...</p>
+  </div>
+} @else if (result()) {
+  <div class="results-wrapper">
+    <div class="result-hero" [class.passed]="result()!.passed" [class.failed]="!result()!.passed">
+      <div class="hero-badge">
+        <i [class]="result()!.passed ? 'pi pi-check-circle' : 'pi pi-times-circle'"></i>
+        <span>{{ result()!.passed ? 'APROBADO' : 'DESAPROBADO' }}</span>
+      </div>
+      <div class="hero-score">{{ result()!.score.toFixed(2) }}</div>
+      <div class="hero-meta">
+        Examen {{ result()!.examCode }} — {{ result()!.examYear }} |
+        Escala: {{ result()!.escalaMagisterial | escala }} |
+        Puntaje mínimo: {{ result()!.minScore }}
+      </div>
+    </div>
+
+    <div class="score-progress">
+      <div class="progress-label">
+        <span>Tu puntaje: {{ result()!.score.toFixed(2) }}</span>
+        <span>Mínimo: {{ result()!.minScore }}</span>
+        <span>Máximo: 100</span>
+      </div>
+      <p-progressBar [value]="scorePercent" [style]="{'height': '20px'}" />
+    </div>
+
+    <div class="grid stats-grid">
+      <div class="col-6 md:col-3">
+        <div class="stat-pill correct">
+          <i class="pi pi-check"></i>
+          <span class="value">{{ result()!.correct }}</span>
+          <span class="label">Correctas</span>
+        </div>
+      </div>
+      <div class="col-6 md:col-3">
+        <div class="stat-pill incorrect">
+          <i class="pi pi-times"></i>
+          <span class="value">{{ result()!.incorrect }}</span>
+          <span class="label">Incorrectas</span>
+        </div>
+      </div>
+      <div class="col-6 md:col-3">
+        <div class="stat-pill unanswered">
+          <i class="pi pi-minus"></i>
+          <span class="value">{{ result()!.unanswered }}</span>
+          <span class="label">Sin responder</span>
+        </div>
+      </div>
+      <div class="col-6 md:col-3">
+        <div class="stat-pill total">
+          <i class="pi pi-list"></i>
+          <span class="value">{{ result()!.totalQuestions }}</span>
+          <span class="label">Total</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="action-btns">
+      <button pButton label="Volver a intentarlo" icon="pi pi-replay" severity="secondary" (click)="retry()"></button>
+      <button pButton label="Ver historial" icon="pi pi-history" severity="secondary" text (click)="goHistory()"></button>
+      <button pButton label="Dashboard" icon="pi pi-home" text (click)="goDashboard()"></button>
+    </div>
+
+    <div class="questions-review">
+      <h3>Revisión de Preguntas</h3>
+      <p-accordion [multiple]="true">
+        @for (q of result()!.questions; track q.number) {
+          <p-accordion-panel [value]="q.number.toString()">
+            <p-accordion-header>
+              <div class="q-header">
+                <span class="q-num">{{ q.number }}</span>
+                <i [class]="q.correct ? 'pi pi-check-circle correct-icon' : (!q.selectedAnswer ? 'pi pi-minus-circle unanswered-icon' : 'pi pi-times-circle incorrect-icon')"></i>
+                <span class="q-preview">{{ q.text | slice:0:80 }}...</span>
+              </div>
+            </p-accordion-header>
+            <p-accordion-content>
+              <div class="q-content">
+                @if (q.groupContextText) {
+                  <div class="q-context">{{ q.groupContextText }}</div>
+                }
+                <div class="q-text">{{ q.text }}</div>
+                <div class="answers-list">
+                  <div class="answer-row" [class]="getAnswerClass(q)">
+                    <span class="answer-label">Tu respuesta:</span>
+                    <span>{{ getAnswerLabel(q, q.selectedAnswer) }}</span>
+                  </div>
+                  <div class="answer-row correct">
+                    <span class="answer-label">Respuesta correcta:</span>
+                    <span>{{ getAnswerLabel(q, q.correctAnswer) }}</span>
+                  </div>
+                </div>
+              </div>
+            </p-accordion-content>
+          </p-accordion-panel>
+        }
+      </p-accordion>
+    </div>
+  </div>
+}

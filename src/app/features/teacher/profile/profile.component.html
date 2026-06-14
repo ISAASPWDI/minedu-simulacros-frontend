@@ -1,0 +1,122 @@
+<p-toast />
+<app-page-header title="Mi Perfil" [breadcrumb]="['Inicio', 'Perfil']" />
+
+<div class="profile-layout">
+  <div class="avatar-section">
+    <div class="avatar-wrapper">
+      @if (profileForm.get('avatarUrl')?.value) {
+        <img [src]="profileForm.get('avatarUrl')?.value" alt="Avatar" class="avatar-img" />
+      } @else {
+        <div class="avatar-initials">{{ avatarInitials }}</div>
+      }
+    </div>
+    <div class="avatar-info">
+      <h2>{{ currentUser()?.firstName }} {{ currentUser()?.lastName }}</h2>
+      <p>{{ currentUser()?.email }}</p>
+    </div>
+  </div>
+
+  <p-tabs value="0">
+    <p-tablist>
+      <p-tab value="0">Datos Personales</p-tab>
+      <p-tab value="1">Cambiar Contraseña</p-tab>
+    </p-tablist>
+    <p-tabpanels>
+      <p-tabpanel value="0">
+        <form [formGroup]="profileForm" (ngSubmit)="saveProfile()" class="profile-form">
+          <div class="grid">
+            <div class="col-12 md:col-6">
+              <div class="field">
+                <label>Nombre</label>
+                <input pInputText formControlName="firstName" class="w-full" />
+              </div>
+            </div>
+            <div class="col-12 md:col-6">
+              <div class="field">
+                <label>Apellido</label>
+                <input pInputText formControlName="lastName" class="w-full" />
+              </div>
+            </div>
+            <div class="col-12 md:col-6">
+              <div class="field">
+                <label>DNI</label>
+                <input pInputText formControlName="dni" class="w-full" maxlength="8" />
+              </div>
+            </div>
+            <div class="col-12 md:col-6">
+              <div class="field">
+                <label>Teléfono</label>
+                <input pInputText formControlName="phone" class="w-full" />
+              </div>
+            </div>
+            <div class="col-12 md:col-6">
+              <div class="field">
+                <label>Región</label>
+                <input pInputText formControlName="region" placeholder="Lima, Cusco..." class="w-full" />
+              </div>
+            </div>
+            <div class="col-12 md:col-6">
+              <div class="field">
+                <label>UGEL</label>
+                <input pInputText formControlName="ugel" placeholder="UGEL 01..." class="w-full" />
+              </div>
+            </div>
+            <div class="col-12">
+              <div class="field">
+                <label>Institución Educativa</label>
+                <input pInputText formControlName="institution" placeholder="IE N°..." class="w-full" />
+              </div>
+            </div>
+            <div class="col-12 md:col-6">
+              <div class="field">
+                <label>Escala Magisterial</label>
+                <p-select formControlName="escalaMagisterial" [options]="escalaOptions" styleClass="w-full" />
+              </div>
+            </div>
+            <div class="col-12 md:col-6">
+              <div class="field">
+                <label>Especialidad de Interés</label>
+                <p-select formControlName="specialtyInterest" [options]="specialtyOptions" styleClass="w-full" />
+              </div>
+            </div>
+            <div class="col-12">
+              <div class="field">
+                <label>URL de Avatar</label>
+                <input pInputText formControlName="avatarUrl" placeholder="https://..." class="w-full" />
+              </div>
+            </div>
+            <div class="col-12">
+              <div class="field">
+                <label>Biografía</label>
+                <textarea pInputText formControlName="bio" rows="3" class="w-full" placeholder="Cuéntanos sobre ti..."></textarea>
+              </div>
+            </div>
+          </div>
+          <div class="form-actions">
+            <button pButton type="submit" label="Guardar cambios" icon="pi pi-save" [loading]="saving()"></button>
+          </div>
+        </form>
+      </p-tabpanel>
+
+      <p-tabpanel value="1">
+        <form [formGroup]="passwordForm" (ngSubmit)="changePassword()" class="password-form">
+          <div class="field">
+            <label>Contraseña actual</label>
+            <p-password formControlName="currentPassword" [feedback]="false" [toggleMask]="true" styleClass="w-full" inputStyleClass="w-full" />
+          </div>
+          <div class="field">
+            <label>Nueva contraseña</label>
+            <p-password formControlName="newPassword" [toggleMask]="true" styleClass="w-full" inputStyleClass="w-full" />
+          </div>
+          <div class="field">
+            <label>Confirmar nueva contraseña</label>
+            <p-password formControlName="confirmPassword" [feedback]="false" [toggleMask]="true" styleClass="w-full" inputStyleClass="w-full" />
+          </div>
+          <div class="form-actions">
+            <button pButton type="submit" label="Cambiar contraseña" icon="pi pi-lock" [loading]="changingPassword()"></button>
+          </div>
+        </form>
+      </p-tabpanel>
+    </p-tabpanels>
+  </p-tabs>
+</div>

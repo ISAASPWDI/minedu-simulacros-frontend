@@ -1,0 +1,98 @@
+<app-page-header title="Panel de Administración" [breadcrumb]="['Admin', 'Dashboard']" />
+
+<div class="grid">
+  <div class="col-12 md:col-4">
+    <div class="stat-card" (click)="goTo('/admin/exams')" style="cursor:pointer">
+      <div class="stat-icon" style="background:rgba(59,130,246,0.15);color:#3b82f6;">
+        <i class="pi pi-file-edit"></i>
+      </div>
+      @if (loading()) {
+        <p-skeleton height="2rem" width="4rem" styleClass="mb-1" />
+      } @else {
+        <div class="stat-value">{{ totalExams() }}</div>
+      }
+      <div class="stat-label">Exámenes registrados</div>
+    </div>
+  </div>
+  <div class="col-12 md:col-4">
+    <div class="stat-card" (click)="goTo('/admin/users')" style="cursor:pointer">
+      <div class="stat-icon" style="background:rgba(34,197,94,0.15);color:#22c55e;">
+        <i class="pi pi-users"></i>
+      </div>
+      @if (loading()) {
+        <p-skeleton height="2rem" width="4rem" styleClass="mb-1" />
+      } @else {
+        <div class="stat-value">{{ totalUsers() }}</div>
+      }
+      <div class="stat-label">Docentes registrados</div>
+    </div>
+  </div>
+  <div class="col-12 md:col-4">
+    <div class="stat-card" (click)="goTo('/admin/payments')" style="cursor:pointer">
+      <div class="stat-icon" style="background:rgba(245,158,11,0.15);color:#f59e0b;">
+        <i class="pi pi-wallet"></i>
+      </div>
+      @if (loading()) {
+        <p-skeleton height="2rem" width="4rem" styleClass="mb-1" />
+      } @else {
+        <div class="stat-value">{{ pendingPayments() }}</div>
+      }
+      <div class="stat-label">Pagos pendientes</div>
+    </div>
+  </div>
+</div>
+
+<div class="content-card mt-4">
+  <div class="card-header">
+    <h3>Últimos pagos pendientes</h3>
+    <button pButton label="Ver todos" severity="secondary" text size="small" (click)="goTo('/admin/payments')"></button>
+  </div>
+  <div class="card-body">
+    @if (loading()) {
+      <p-skeleton height="3rem" styleClass="mb-2" />
+      <p-skeleton height="3rem" styleClass="mb-2" />
+      <p-skeleton height="3rem" />
+    } @else if (recentOrders().length === 0) {
+      <div class="empty-state">
+        <i class="pi pi-check-circle" style="color:#22c55e;font-size:2.5rem;"></i>
+        <p>No hay pagos pendientes</p>
+      </div>
+    } @else {
+      <table class="simple-table">
+        <thead>
+          <tr>
+            <th>Docente</th>
+            <th>Plan</th>
+            <th>Monto</th>
+            <th>Fecha</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (o of recentOrders(); track o.id) {
+            <tr>
+              <td>{{ o.userName }}</td>
+              <td>{{ o.planName }}</td>
+              <td>S/ {{ o.amount }}</td>
+              <td>{{ o.createdAt | date:'dd/MM/yyyy' }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    }
+  </div>
+</div>
+
+<div class="grid mt-4">
+  <div class="col-12 md:col-6 lg:col-3">
+    <button pButton label="Gestionar Exámenes" icon="pi pi-file-edit" class="w-full quick-btn" severity="secondary" (click)="goTo('/admin/exams')"></button>
+  </div>
+  <div class="col-12 md:col-6 lg:col-3">
+    <button pButton label="Gestionar Usuarios" icon="pi pi-users" class="w-full quick-btn" severity="secondary" (click)="goTo('/admin/users')"></button>
+  </div>
+  <div class="col-12 md:col-6 lg:col-3">
+    <button pButton label="Ver Pagos" icon="pi pi-wallet" class="w-full quick-btn" severity="secondary" (click)="goTo('/admin/payments')"></button>
+  </div>
+  <div class="col-12 md:col-6 lg:col-3">
+    <button pButton label="Configuración" icon="pi pi-cog" class="w-full quick-btn" severity="secondary" (click)="goTo('/admin/config')"></button>
+  </div>
+</div>

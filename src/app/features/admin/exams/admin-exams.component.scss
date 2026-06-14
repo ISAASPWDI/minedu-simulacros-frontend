@@ -1,0 +1,63 @@
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.exams-card {
+  background: var(--surface-card);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.action-row {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.create-form .field {
+  margin-bottom: 1rem;
+
+  label {
+    display: block;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-bottom: 0.4rem;
+  }
+}
+
+.upload-hint {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-bottom: 0.75rem;
+  line-height: 1.5;
+
+  code {
+    background: rgba(255,255,255,0.08);
+    padding: 0.1rem 0.4rem;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    color: #3b82f6;
+  }
+}
+
+.json-area {
+  font-family: monospace;
+  font-size: 0.8rem;
+  resize: vertical;
+  background: rgba(0,0,0,0.2);
+  color: var(--text-color);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 0.75rem;
+}
+
+.field {
+  label {
+    display: block;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-bottom: 0.4rem;
+  }
+}

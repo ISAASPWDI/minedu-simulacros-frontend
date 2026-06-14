@@ -1,0 +1,125 @@
+<app-page-header title="Mi Dashboard" [breadcrumb]="['Inicio', 'Dashboard']" />
+
+@if (!subscription()?.active) {
+  <div class="alert-banner">
+    <i class="pi pi-exclamation-triangle"></i>
+    <span>No tienes una suscripción activa. <a routerLink="/teacher/subscription" class="alert-link">Suscríbete aquí</a> para acceder a todos los simulacros.</span>
+  </div>
+}
+
+<div class="grid">
+  <div class="col-12 md:col-6 lg:col-3">
+    <div class="stat-card">
+      <div class="stat-icon" style="background: rgba(59,130,246,0.15); color: #3b82f6;">
+        <i class="pi pi-book"></i>
+      </div>
+      <div class="stat-value">{{ stats()?.totalSessions ?? 0 }}</div>
+      <div class="stat-label">Simulacros realizados</div>
+    </div>
+  </div>
+  <div class="col-12 md:col-6 lg:col-3">
+    <div class="stat-card">
+      <div class="stat-icon" style="background: rgba(34,197,94,0.15); color: #22c55e;">
+        <i class="pi pi-check-circle"></i>
+      </div>
+      <div class="stat-value">{{ stats()?.passedSessions ?? 0 }}</div>
+      <div class="stat-label">Aprobados</div>
+    </div>
+  </div>
+  <div class="col-12 md:col-6 lg:col-3">
+    <div class="stat-card">
+      <div class="stat-icon" style="background: rgba(245,158,11,0.15); color: #f59e0b;">
+        <i class="pi pi-chart-line"></i>
+      </div>
+      <div class="stat-value">{{ stats()?.averageScore?.toFixed(1) ?? '0.0' }}</div>
+      <div class="stat-label">Puntaje promedio</div>
+    </div>
+  </div>
+  <div class="col-12 md:col-6 lg:col-3">
+    <div class="stat-card">
+      <div class="stat-icon" style="background: rgba(139,92,246,0.15); color: #8b5cf6;">
+        <i class="pi pi-star"></i>
+      </div>
+      <div class="stat-value">{{ stats()?.bestScore?.toFixed(1) ?? '0.0' }}</div>
+      <div class="stat-label">Mejor puntaje</div>
+    </div>
+  </div>
+</div>
+
+<div class="grid mt-3">
+  <div class="col-12 lg:col-8">
+    <div class="content-card">
+      <div class="card-header">
+        <h3>Historial de Puntajes</h3>
+      </div>
+      <div class="card-body">
+        @if (chartData()) {
+          <p-chart type="line" [data]="chartData()" [options]="chartOptions()" height="220" />
+        } @else {
+          <div class="empty-chart">
+            <i class="pi pi-chart-line"></i>
+            <p>Realiza tu primer simulacro para ver tu progreso</p>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+
+  <div class="col-12 lg:col-4">
+    <div class="content-card h-full">
+      <div class="card-header">
+        <h3>Acceso Rápido</h3>
+      </div>
+      <div class="card-body quick-actions">
+        <button pButton label="Iniciar Simulacro" icon="pi pi-play" class="w-full" (click)="goToExams()" [disabled]="!subscription()?.active"></button>
+        <div class="rate-display">
+          <div class="rate-label">Tasa de aprobación</div>
+          <div class="rate-value" [class.high]="approvalRate >= 60" [class.low]="approvalRate < 60">{{ approvalRate }}%</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="content-card mt-3">
+  <div class="card-header">
+    <h3>Últimos Simulacros</h3>
+    <a routerLink="/teacher/history" class="view-all">Ver todos</a>
+  </div>
+  <div class="card-body">
+    @if (loading()) {
+      <p-skeleton height="3rem" styleClass="mb-2" *ngFor="let i of [1,2,3]" />
+    } @else if (recentSessions().length === 0) {
+      <div class="empty-state">
+        <i class="pi pi-inbox"></i>
+        <p>No has realizado ningún simulacro aún</p>
+        <button pButton label="Comenzar ahora" icon="pi pi-play" severity="secondary" (click)="goToExams()"></button>
+      </div>
+    } @else {
+      <p-table [value]="recentSessions()" [tableStyle]="{'min-width': '100%'}">
+        <ng-template pTemplate="header">
+          <tr>
+            <th>Examen</th>
+            <th>Escala</th>
+            <th>Puntaje</th>
+            <th>Estado</th>
+            <th>Acción</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-s>
+          <tr>
+            <td>{{ s.examCode }} ({{ s.examYear }})</td>
+            <td>{{ s.escalaMagisterial | escala }}</td>
+            <td>{{ s.score.toFixed(1) }}</td>
+            <td>
+              <p-tag [value]="s.passed ? 'Aprobado' : 'Desaprobado'" [severity]="getPassedSeverity(s.passed)" />
+            </td>
+            <td>
+              <button pButton icon="pi pi-eye" size="small" severity="secondary" text (click)="goToResult(s.sessionId)"></button>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    }
+  </div>
+</div>

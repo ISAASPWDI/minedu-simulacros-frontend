@@ -1,0 +1,59 @@
+<p-toast />
+<p-confirmDialog />
+
+<div class="layout-wrapper">
+  <aside class="layout-sidebar" [class.open]="sidebarOpen()">
+    <div class="sidebar-logo">
+      <div class="logo-icon admin">
+        <i class="pi pi-shield"></i>
+      </div>
+      <div class="logo-text">
+        <span class="logo-title">ADMIN</span>
+        <span class="logo-subtitle">Panel de Control</span>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      @for (item of navItems; track item.route) {
+        <a class="nav-item" [class.active]="isActive(item.route)" (click)="navigate(item.route)">
+          <i [class]="item.icon"></i>
+          <span>{{ item.label }}</span>
+        </a>
+      }
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="user-info">
+        <div class="user-avatar admin">{{ userInitials }}</div>
+        <div class="user-details">
+          <span class="user-name">{{ currentUser()?.firstName }} {{ currentUser()?.lastName }}</span>
+          <span class="user-role">Administrador</span>
+        </div>
+      </div>
+      <button pButton icon="pi pi-sign-out" severity="secondary" text (click)="logout()"></button>
+    </div>
+  </aside>
+
+  <div class="layout-main">
+    <header class="layout-topbar">
+      <button pButton icon="pi pi-bars" severity="secondary" text class="sidebar-toggle" (click)="toggleSidebar()"></button>
+      <div class="topbar-brand">
+        <i class="pi pi-shield" style="color: #f59e0b; margin-right: 0.5rem;"></i>
+        Panel Administrativo
+      </div>
+      <div class="topbar-spacer"></div>
+      <div class="topbar-user">
+        <div class="topbar-avatar admin">{{ userInitials }}</div>
+        <span class="topbar-username">{{ currentUser()?.firstName }}</span>
+      </div>
+    </header>
+
+    <main class="layout-content">
+      <router-outlet />
+    </main>
+  </div>
+</div>
+
+@if (sidebarOpen()) {
+  <div class="sidebar-overlay" (click)="toggleSidebar()"></div>
+}
