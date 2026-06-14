@@ -41,7 +41,7 @@ export class TeacherDashboardComponent implements OnInit {
     this.simulationService.getStats().subscribe({
       next: (s) => {
         this.stats.set(s);
-        this.buildChart(s.scoreHistory);
+        this.buildChart(Object.values(s.examsByYear ?? {}));
       },
       error: () => {}
     });
@@ -109,7 +109,7 @@ export class TeacherDashboardComponent implements OnInit {
 
   get approvalRate(): number {
     const s = this.stats();
-    if (!s || s.totalSessions === 0) return 0;
-    return Math.round((s.passedSessions / s.totalSessions) * 100);
+    if (!s || s.totalExams === 0) return 0;
+    return Math.round((s.totalPassed / s.totalExams) * 100);
   }
 }

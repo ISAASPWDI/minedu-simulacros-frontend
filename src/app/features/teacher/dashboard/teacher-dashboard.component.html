@@ -1,6 +1,6 @@
 <app-page-header title="Mi Dashboard" [breadcrumb]="['Inicio', 'Dashboard']" />
 
-@if (!subscription()?.active) {
+@if (!subscription()?.isActive) {
   <div class="alert-banner">
     <i class="pi pi-exclamation-triangle"></i>
     <span>No tienes una suscripción activa. <a routerLink="/teacher/subscription" class="alert-link">Suscríbete aquí</a> para acceder a todos los simulacros.</span>
@@ -13,7 +13,7 @@
       <div class="stat-icon" style="background: rgba(59,130,246,0.15); color: #3b82f6;">
         <i class="pi pi-book"></i>
       </div>
-      <div class="stat-value">{{ stats()?.totalSessions ?? 0 }}</div>
+      <div class="stat-value">{{ stats()?.totalExams ?? 0 }}</div>
       <div class="stat-label">Simulacros realizados</div>
     </div>
   </div>
@@ -22,7 +22,7 @@
       <div class="stat-icon" style="background: rgba(34,197,94,0.15); color: #22c55e;">
         <i class="pi pi-check-circle"></i>
       </div>
-      <div class="stat-value">{{ stats()?.passedSessions ?? 0 }}</div>
+      <div class="stat-value">{{ stats()?.totalPassed ?? 0 }}</div>
       <div class="stat-label">Aprobados</div>
     </div>
   </div>
@@ -71,7 +71,7 @@
         <h3>Acceso Rápido</h3>
       </div>
       <div class="card-body quick-actions">
-        <button pButton label="Iniciar Simulacro" icon="pi pi-play" class="w-full" (click)="goToExams()" [disabled]="!subscription()?.active"></button>
+        <button pButton label="Iniciar Simulacro" icon="pi pi-play" class="w-full" (click)="goToExams()" [disabled]="!subscription()?.isActive"></button>
         <div class="rate-display">
           <div class="rate-label">Tasa de aprobación</div>
           <div class="rate-value" [class.high]="approvalRate >= 60" [class.low]="approvalRate < 60">{{ approvalRate }}%</div>
@@ -108,14 +108,14 @@
         </ng-template>
         <ng-template pTemplate="body" let-s>
           <tr>
-            <td>{{ s.examCode }} ({{ s.examYear }})</td>
-            <td>{{ s.escalaMagisterial | escala }}</td>
-            <td>{{ s.score.toFixed(1) }}</td>
+            <td>{{ s.examCode }} ({{ s.year }})</td>
+            <td>{{ s.escala | escala }}</td>
+            <td>{{ s.score?.toFixed(1) ?? '—' }}</td>
             <td>
               <p-tag [value]="s.passed ? 'Aprobado' : 'Desaprobado'" [severity]="getPassedSeverity(s.passed)" />
             </td>
             <td>
-              <button pButton icon="pi pi-eye" size="small" severity="secondary" text (click)="goToResult(s.sessionId)"></button>
+              <button pButton icon="pi pi-eye" size="small" severity="secondary" text (click)="goToResult(s.id)"></button>
             </td>
           </tr>
         </ng-template>

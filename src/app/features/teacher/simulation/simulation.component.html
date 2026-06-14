@@ -49,16 +49,11 @@
 
       <main class="sim-main">
         @if (currentQuestion()) {
-          @if (currentQuestion()!.groupContextText) {
-            <div class="context-panel">
-              <div class="context-label">Texto de contexto</div>
-              <p>{{ currentQuestion()!.groupContextText }}</p>
-            </div>
-          }
+
 
           <div class="question-panel">
             <div class="question-number">Pregunta {{ currentQuestion()!.number }}</div>
-            <div class="question-text">{{ currentQuestion()!.text }}</div>
+            <div class="question-text">{{ currentQuestion()!.questionText }}</div>
 
             <div class="options-list">
               <div

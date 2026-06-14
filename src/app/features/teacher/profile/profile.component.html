@@ -2,18 +2,9 @@
 <app-page-header title="Mi Perfil" [breadcrumb]="['Inicio', 'Perfil']" />
 
 <div class="profile-layout">
-  <div class="avatar-section">
-    <div class="avatar-wrapper">
-      @if (profileForm.get('avatarUrl')?.value) {
-        <img [src]="profileForm.get('avatarUrl')?.value" alt="Avatar" class="avatar-img" />
-      } @else {
-        <div class="avatar-initials">{{ avatarInitials }}</div>
-      }
-    </div>
-    <div class="avatar-info">
-      <h2>{{ currentUser()?.firstName }} {{ currentUser()?.lastName }}</h2>
-      <p>{{ currentUser()?.email }}</p>
-    </div>
+  <div class="profile-identity">
+    <h2>{{ currentUser()?.profile?.firstName }} {{ currentUser()?.profile?.lastName }}</h2>
+    <p class="profile-email">{{ currentUser()?.email }}</p>
   </div>
 
   <p-tabs value="0">
@@ -77,12 +68,6 @@
               <div class="field">
                 <label>Especialidad de Interés</label>
                 <p-select formControlName="specialtyInterest" [options]="specialtyOptions" styleClass="w-full" />
-              </div>
-            </div>
-            <div class="col-12">
-              <div class="field">
-                <label>URL de Avatar</label>
-                <input pInputText formControlName="avatarUrl" placeholder="https://..." class="w-full" />
               </div>
             </div>
             <div class="col-12">

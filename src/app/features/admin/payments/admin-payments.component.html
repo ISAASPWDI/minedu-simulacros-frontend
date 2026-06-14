@@ -1,32 +1,16 @@
 <p-toast />
-<app-page-header title="Gestión de Pagos" [breadcrumb]="['Admin', 'Pagos']" />
-
-<div class="toolbar mb-3">
-  <p-select
-    [options]="statusOptions"
-    [ngModel]="filterStatus()"
-    (ngModelChange)="filterStatus.set($event); onFilterChange()"
-    placeholder="Filtrar por estado"
-    styleClass="filter-drop"
-  />
-</div>
+<app-page-header title="Pedidos Pendientes" [breadcrumb]="['Admin', 'Pagos']" />
 
 <div class="payments-card">
   <p-table
     [value]="orders()"
     [loading]="loading()"
-    [tableStyle]="{'min-width': '800px'}"
-    [paginator]="true"
-    [rows]="pageSize"
-    [totalRecords]="totalRecords()"
-    [lazy]="true"
-    (onLazyLoad)="onPageChange($event)"
+    [tableStyle]="{'min-width': '700px'}"
     styleClass="p-datatable-sm"
   >
     <ng-template pTemplate="header">
       <tr>
         <th>Fecha</th>
-        <th>Docente</th>
         <th>Plan</th>
         <th>Monto</th>
         <th>Referencia</th>
@@ -37,7 +21,6 @@
     <ng-template pTemplate="body" let-o>
       <tr>
         <td>{{ o.createdAt | date:'dd/MM/yyyy HH:mm' }}</td>
-        <td>{{ o.userName }}</td>
         <td>{{ o.planName }}</td>
         <td>S/ {{ o.amount }}</td>
         <td class="text-muted">{{ o.yapeReference || '—' }}</td>
@@ -46,27 +29,22 @@
         </td>
         <td>
           @if (o.status === 'PENDING') {
-            <div class="action-row">
-              <button pButton icon="pi pi-check" size="small" severity="success" text pTooltip="Confirmar pago" (click)="openConfirm(o)"></button>
-              <button pButton icon="pi pi-times" size="small" severity="danger" text pTooltip="Rechazar" (click)="openReject(o)"></button>
-            </div>
+            <button pButton icon="pi pi-check" size="small" severity="success" text pTooltip="Confirmar pago" (click)="openConfirm(o)"></button>
           }
         </td>
       </tr>
     </ng-template>
     <ng-template pTemplate="emptymessage">
       <tr>
-        <td colspan="7" class="text-center" style="padding:2rem;color:var(--text-muted)">No hay pedidos de pago</td>
+        <td colspan="6" class="text-center" style="padding:2rem;color:var(--text-muted)">No hay pedidos pendientes</td>
       </tr>
     </ng-template>
   </p-table>
 </div>
 
-<!-- Confirmar pago -->
 <p-dialog header="Confirmar Pago" [visible]="showConfirmDialog()" (visibleChange)="showConfirmDialog.set($event)" [modal]="true" [style]="{'width':'400px'}">
   @if (selectedOrder()) {
     <div class="order-summary">
-      <div><strong>Docente:</strong> {{ selectedOrder()!.userName }}</div>
       <div><strong>Plan:</strong> {{ selectedOrder()!.planName }}</div>
       <div><strong>Monto:</strong> S/ {{ selectedOrder()!.amount }}</div>
     </div>
@@ -78,17 +56,5 @@
   <ng-template pTemplate="footer">
     <button pButton label="Cancelar" severity="secondary" text (click)="showConfirmDialog.set(false)"></button>
     <button pButton label="Confirmar" icon="pi pi-check" severity="success" [loading]="confirming()" (click)="confirmPayment()"></button>
-  </ng-template>
-</p-dialog>
-
-<!-- Rechazar pago -->
-<p-dialog header="Rechazar Pago" [visible]="showRejectDialog()" (visibleChange)="showRejectDialog.set($event)" [modal]="true" [style]="{'width':'400px'}">
-  <div class="field">
-    <label>Motivo del rechazo</label>
-    <input pInputText [ngModel]="rejectReason()" (ngModelChange)="rejectReason.set($event)" placeholder="Ej: Referencia no encontrada" class="w-full" />
-  </div>
-  <ng-template pTemplate="footer">
-    <button pButton label="Cancelar" severity="secondary" text (click)="showRejectDialog.set(false)"></button>
-    <button pButton label="Rechazar" icon="pi pi-times" severity="danger" [loading]="rejecting()" (click)="rejectPayment()"></button>
   </ng-template>
 </p-dialog>

@@ -54,10 +54,9 @@ export class AdminExamsComponent implements OnInit {
     code: ['', Validators.required],
     year: [new Date().getFullYear(), [Validators.required, Validators.min(2000)]],
     level: ['PRIMARIA', Validators.required],
-    specialty: ['', Validators.required],
-    forma: [1, Validators.required],
-    durationMinutes: [180, [Validators.required, Validators.min(1)]],
-    totalQuestions: [60, [Validators.required, Validators.min(1)]]
+    specialtyId: ['', Validators.required],
+    formNumber: [1, Validators.required],
+    durationMinutes: [180, [Validators.required, Validators.min(1)]]
   });
 
   ngOnInit(): void {
@@ -76,11 +75,11 @@ export class AdminExamsComponent implements OnInit {
   createExam(): void {
     if (this.createForm.invalid) { this.createForm.markAllAsTouched(); return; }
     this.creating.set(true);
-    this.examService.createExam(this.createForm.value as Partial<ExamConfig>).subscribe({
+    this.examService.createExam(this.createForm.value).subscribe({
       next: (exam) => {
         this.creating.set(false);
         this.showCreateDialog.set(false);
-        this.createForm.reset({ year: new Date().getFullYear(), level: 'PRIMARIA', forma: 1, durationMinutes: 180, totalQuestions: 60 });
+        this.createForm.reset({ year: new Date().getFullYear(), level: 'PRIMARIA', formNumber: 1, durationMinutes: 180 });
         this.exams.update(list => [exam, ...list]);
         this.messageService.add({ severity: 'success', summary: 'Creado', detail: `Examen ${exam.code} creado.` });
       },
@@ -160,6 +159,6 @@ export class AdminExamsComponent implements OnInit {
   }
 
   get specialtyOptions() {
-    return this.specialties().map(s => ({ label: s.name, value: s.name }));
+    return this.specialties().map(s => ({ label: s.name, value: s.id }));
   }
 }

@@ -67,7 +67,7 @@ export class ExamSelectionComponent implements OnInit {
     this.examService.getYears().subscribe(y => this.years.set(y));
     this.examService.getSpecialties().subscribe(s => this.specialties.set(s));
     this.paymentService.getSubscription().subscribe({
-      next: (sub) => this.hasSubscription.set(sub?.active),
+      next: (sub) => this.hasSubscription.set(sub?.isActive ?? false),
       error: () => this.hasSubscription.set(false)
     });
     this.loadExams();
@@ -106,7 +106,7 @@ export class ExamSelectionComponent implements OnInit {
       next: (result) => {
         this.starting.set(false);
         this.showDialog.set(false);
-        this.router.navigate(['/teacher/simulation', result.session.id], { state: { sessionData: result } });
+        this.router.navigate(['/teacher/simulation', result.sessionId], { state: { sessionData: result } });
       },
       error: (err) => {
         this.starting.set(false);

@@ -73,10 +73,10 @@ export class TeacherLayoutComponent implements OnInit {
   get userInitials(): string {
     const u = this.currentUser();
     if (!u) return '?';
-    return `${u.firstName[0]}${u.lastName[0]}`.toUpperCase();
+    return `${u.profile?.firstName?.[0] ?? '?'}${u.profile?.lastName?.[0] ?? ''}`.toUpperCase();
   }
 
   get hasActiveSubscription(): boolean {
-    return this.subscription()?.active === true;
+    return this.subscription()?.isActive === true;
   }
 }

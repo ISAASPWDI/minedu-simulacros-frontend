@@ -64,8 +64,7 @@ export class ProfileComponent implements OnInit {
     institution: [''],
     escalaMagisterial: [''],
     specialtyInterest: [''],
-    bio: [''],
-    avatarUrl: ['']
+    bio: ['']
   });
 
   passwordForm = this.fb.group({
@@ -79,17 +78,16 @@ export class ProfileComponent implements OnInit {
     this.currentUser.set(user);
     if (user) {
       this.profileForm.patchValue({
-        firstName: user.firstName,
-        lastName: user.lastName,
-        dni: user.dni,
-        phone: user.phone,
+        firstName: user.profile?.firstName ?? '',
+        lastName: user.profile?.lastName ?? '',
+        dni: user.profile?.dni ?? '',
+        phone: user.profile?.phone ?? '',
         region: user.profile?.region ?? '',
         ugel: user.profile?.ugel ?? '',
         institution: user.profile?.institution ?? '',
         escalaMagisterial: user.profile?.escalaMagisterial ?? '',
         specialtyInterest: user.profile?.specialtyInterest ?? '',
-        bio: user.profile?.bio ?? '',
-        avatarUrl: user.profile?.avatarUrl ?? ''
+        bio: user.profile?.bio ?? ''
       });
     }
   }
@@ -97,7 +95,7 @@ export class ProfileComponent implements OnInit {
   saveProfile(): void {
     if (this.profileForm.invalid) return;
     this.saving.set(true);
-    this.http.put(`${environment.apiUrl}/profile`, this.profileForm.value).subscribe({
+    this.http.put(`${environment.apiUrl}/users/me/profile`, this.profileForm.value).subscribe({
       next: () => {
         this.saving.set(false);
         this.messageService.add({ severity: 'success', summary: 'Guardado', detail: 'Perfil actualizado correctamente.' });
@@ -116,7 +114,7 @@ export class ProfileComponent implements OnInit {
       return;
     }
     this.changingPassword.set(true);
-    this.http.put(`${environment.apiUrl}/profile/password`, { currentPassword: form.currentPassword, newPassword: form.newPassword }).subscribe({
+    this.http.put(`${environment.apiUrl}/users/me/password`, { currentPassword: form.currentPassword, newPassword: form.newPassword }).subscribe({
       next: () => {
         this.changingPassword.set(false);
         this.passwordForm.reset();
@@ -129,10 +127,5 @@ export class ProfileComponent implements OnInit {
       }
     });
   }
-
-  get avatarInitials(): string {
-    const u = this.currentUser();
-    if (!u) return '?';
-    return `${u.firstName[0]}${u.lastName[0]}`.toUpperCase();
-  }
 }
+

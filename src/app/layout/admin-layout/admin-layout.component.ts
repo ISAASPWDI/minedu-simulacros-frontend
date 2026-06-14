@@ -60,6 +60,6 @@ export class AdminLayoutComponent implements OnInit {
   get userInitials(): string {
     const u = this.currentUser();
     if (!u) return 'A';
-    return `${u.firstName[0]}${u.lastName[0]}`.toUpperCase();
+    return `${u.profile?.firstName?.[0] ?? '?'}${u.profile?.lastName?.[0] ?? ''}`.toUpperCase();
   }
 }

@@ -61,7 +61,7 @@
       <table class="simple-table">
         <thead>
           <tr>
-            <th>Docente</th>
+            <th>ID</th>
             <th>Plan</th>
             <th>Monto</th>
             <th>Fecha</th>
@@ -70,7 +70,7 @@
         <tbody>
           @for (o of recentOrders(); track o.id) {
             <tr>
-              <td>{{ o.userName }}</td>
+              <td class="text-muted" style="font-size:0.8em">{{ o.id | slice:0:8 }}…</td>
               <td>{{ o.planName }}</td>
               <td>S/ {{ o.amount }}</td>
               <td>{{ o.createdAt | date:'dd/MM/yyyy' }}</td>

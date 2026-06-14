@@ -53,7 +53,7 @@ export class SubscriptionComponent implements OnInit {
     });
 
     this.paymentService.getUserOrders().subscribe({
-      next: (page) => this.orders.set(page.content),
+      next: (orders) => this.orders.set(orders),
       error: () => {}
     });
 
@@ -61,6 +61,13 @@ export class SubscriptionComponent implements OnInit {
       next: (info) => this.yapeInfo.set(info),
       error: () => {}
     });
+  }
+
+  get daysRemaining(): number {
+    const sub = this.subscription();
+    if (!sub) return 0;
+    const diff = new Date(sub.expiresAt).getTime() - Date.now();
+    return Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)));
   }
 
   selectPlan(plan: SubscriptionPlan): void {
@@ -95,13 +102,13 @@ export class SubscriptionComponent implements OnInit {
   }
 
   getOrderStatusLabel(status: string): string {
-    const map: Record<string, string> = { PENDING: 'Pendiente', CONFIRMED: 'Confirmado', REJECTED: 'Rechazado' };
+    const map: Record<string, string> = { PENDING: 'Pendiente', COMPLETED: 'Confirmado', FAILED: 'Rechazado', REFUNDED: 'Reembolsado' };
     return map[status] ?? status;
   }
 
   getOrderSeverity(status: string): 'warn' | 'success' | 'danger' | 'secondary' {
-    if (status === 'CONFIRMED') return 'success';
-    if (status === 'REJECTED') return 'danger';
+    if (status === 'COMPLETED') return 'success';
+    if (status === 'FAILED' || status === 'REFUNDED') return 'danger';
     return 'warn';
   }
 }

@@ -24,20 +24,20 @@
         <td><strong>{{ exam.code }}</strong></td>
         <td>{{ exam.year }}</td>
         <td>{{ exam.level | nivel }}</td>
-        <td>{{ exam.specialty }}</td>
+        <td>{{ exam.specialtyName }}</td>
         <td>{{ exam.durationMinutes }} min</td>
         <td>{{ exam.totalQuestions }}</td>
         <td>
-          <p-tag [value]="exam.active ? 'Activo' : 'Inactivo'" [severity]="exam.active ? 'success' : 'secondary'" />
+          <p-tag [value]="exam.isActive ? 'Activo' : 'Inactivo'" [severity]="exam.isActive ? 'success' : 'secondary'" />
         </td>
         <td>
           <div class="action-row">
             <button pButton icon="pi pi-upload" size="small" severity="info" text pTooltip="Cargar preguntas" (click)="openUpload(exam)"></button>
             <button pButton icon="pi pi-clock" size="small" severity="secondary" text pTooltip="Cambiar duración" (click)="openDuration(exam)"></button>
             <button pButton
-              [icon]="exam.active ? 'pi pi-eye-slash' : 'pi pi-eye'"
+              [icon]="exam.isActive ? 'pi pi-eye-slash' : 'pi pi-eye'"
               size="small"
-              [severity]="exam.active ? 'danger' : 'success'"
+              [severity]="exam.isActive ? 'danger' : 'success'"
               text
               [loading]="toggling() === exam.id"
               (click)="toggleActive(exam)"
@@ -79,25 +79,19 @@
       <div class="col-12 md:col-6">
         <div class="field">
           <label>Especialidad</label>
-          <p-select formControlName="specialty" [options]="specialtyOptions" placeholder="Seleccionar" styleClass="w-full" />
+          <p-select formControlName="specialtyId" [options]="specialtyOptions" placeholder="Seleccionar" styleClass="w-full" />
         </div>
       </div>
-      <div class="col-12 md:col-4">
+      <div class="col-12 md:col-6">
         <div class="field">
           <label>Forma</label>
-          <input pInputText type="number" formControlName="forma" class="w-full" />
+          <input pInputText type="number" formControlName="formNumber" class="w-full" />
         </div>
       </div>
-      <div class="col-12 md:col-4">
+      <div class="col-12 md:col-6">
         <div class="field">
           <label>Duración (min)</label>
           <input pInputText type="number" formControlName="durationMinutes" class="w-full" />
-        </div>
-      </div>
-      <div class="col-12 md:col-4">
-        <div class="field">
-          <label>N° Preguntas</label>
-          <input pInputText type="number" formControlName="totalQuestions" class="w-full" />
         </div>
       </div>
     </div>
@@ -110,12 +104,12 @@
 
 <!-- Cargar preguntas -->
 <p-dialog header="Cargar Preguntas (JSON)" [visible]="showUploadDialog()" (visibleChange)="showUploadDialog.set($event)" [modal]="true" [style]="{'width':'600px'}">
-  <div class="upload-hint">Pega el JSON con las preguntas. Cada pregunta debe tener: <code>number, text, optionA, optionB, optionC, correctAnswer</code></div>
+  <div class="upload-hint">Pega el JSON con las preguntas. Cada pregunta debe tener: <code>number, questionText, optionA, optionB, optionC, correctAnswer</code></div>
   <textarea
     pInputText
     class="w-full json-area"
     rows="12"
-    placeholder='[{"number":1,"text":"Pregunta...","optionA":"A","optionB":"B","optionC":"C","correctAnswer":"A"}]'
+    placeholder='[{"number":1,"questionText":"Pregunta...","optionA":"A","optionB":"B","optionC":"C","correctAnswer":"A"}]'
     [ngModel]="questionsJson()"
     (ngModelChange)="questionsJson.set($event)"
   ></textarea>

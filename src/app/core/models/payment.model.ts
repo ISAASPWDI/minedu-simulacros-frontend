@@ -4,38 +4,39 @@ export interface SubscriptionPlan {
   description: string;
   price: number;
   durationDays: number;
-  features: string[];
-  active: boolean;
+  maxExamsPerDay: number | null;
+  features: string;
+  isActive: boolean;
 }
 
 export interface UserSubscription {
   id: string;
+  userId: string;
   planId: string;
   planName: string;
-  startDate: string;
-  endDate: string;
-  active: boolean;
-  daysRemaining: number;
+  status: string;
+  startsAt: string;
+  expiresAt: string;
+  paymentReference: string | null;
+  createdAt: string;
+  isActive: boolean;
 }
 
 export interface PaymentOrder {
   id: string;
   userId: string;
-  userName: string;
   planId: string;
   planName: string;
   amount: number;
-  status: 'PENDING' | 'CONFIRMED' | 'REJECTED';
-  yapeReference?: string;
-  notes?: string;
+  status: string;
+  yapeReference: string | null;
+  confirmedAt: string | null;
+  notes: string | null;
   createdAt: string;
-  confirmedAt?: string;
-  rejectedAt?: string;
-  rejectionReason?: string;
 }
 
 export interface YapeQrInfo {
-  qrImageUrl: string;
-  phone: string;
-  holderName: string;
+  yape_phone: string;
+  yape_name: string;
+  yape_qr_url: string;
 }

@@ -3,33 +3,31 @@ export interface ExamConfig {
   code: string;
   year: number;
   level: 'PRIMARIA' | 'SECUNDARIA';
-  specialty: string;
-  forma: number;
+  specialtyName: string;
+  formNumber: number;
   durationMinutes: number;
   totalQuestions: number;
-  active: boolean;
-  createdAt: string;
+  isActive: boolean;
 }
 
 export interface Question {
   id: string;
   number: number;
-  text: string;
+  questionText: string;
   optionA: string;
   optionB: string;
   optionC: string;
-  correctAnswer?: string;
-  groupId?: string;
 }
 
 export interface QuestionGroup {
   id: string;
   contextText: string;
-  questions: Question[];
+  questionStart: number;
+  questionEnd: number;
 }
 
 export interface ExamDetail {
-  exam: ExamConfig;
+  config: ExamConfig;
   questions: Question[];
   groups: QuestionGroup[];
 }
@@ -37,5 +35,5 @@ export interface ExamDetail {
 export interface Specialty {
   id: string;
   name: string;
-  level: string;
+  description: string;
 }

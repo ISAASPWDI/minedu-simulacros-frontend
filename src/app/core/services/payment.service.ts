@@ -1,9 +1,9 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 import { SubscriptionPlan, UserSubscription, PaymentOrder, YapeQrInfo } from '../models/payment.model';
-import { PageResponse } from '../models/config.model';
 
 @Injectable({ providedIn: 'root' })
 export class PaymentService {
@@ -11,41 +11,30 @@ export class PaymentService {
   private base = `${environment.apiUrl}/payments`;
 
   getPlans(): Observable<SubscriptionPlan[]> {
-    return this.http.get<SubscriptionPlan[]>(`${environment.apiUrl}/plans`);
+    return this.http.get<any>(`${environment.apiUrl}/plans/`).pipe(map(r => r.data));
   }
 
   getYapeInfo(): Observable<YapeQrInfo> {
-    return this.http.get<YapeQrInfo>(`${environment.apiUrl}/payments/yape-info`);
+    return this.http.get<any>(`${environment.apiUrl}/yape/info`).pipe(map(r => r.data));
   }
 
   createOrder(planId: string, notes?: string): Observable<PaymentOrder> {
-    return this.http.post<PaymentOrder>(this.base, { planId, notes });
+    return this.http.post<any>(`${this.base}/orders`, { planId, notes }).pipe(map(r => r.data));
   }
 
-  getUserOrders(): Observable<PageResponse<PaymentOrder>> {
-    return this.http.get<PageResponse<PaymentOrder>>(`${this.base}/my-orders`);
+  getUserOrders(): Observable<PaymentOrder[]> {
+    return this.http.get<any>(`${this.base}/orders/my`).pipe(map(r => r.data));
   }
 
-  getSubscription(): Observable<UserSubscription> {
-    return this.http.get<UserSubscription>(`${environment.apiUrl}/subscriptions/current`);
+  getSubscription(): Observable<UserSubscription | null> {
+    return this.http.get<any>(`${this.base}/subscription/my`).pipe(map(r => r.data));
   }
 
-  getPendingOrders(page: number = 0, size: number = 10): Observable<PageResponse<PaymentOrder>> {
-    const params = new HttpParams().set('page', page.toString()).set('size', size.toString()).set('status', 'PENDING');
-    return this.http.get<PageResponse<PaymentOrder>>(`${environment.apiUrl}/admin/payments`, { params });
-  }
-
-  getAllOrders(page: number = 0, size: number = 10, status?: string): Observable<PageResponse<PaymentOrder>> {
-    let params = new HttpParams().set('page', page.toString()).set('size', size.toString());
-    if (status) params = params.set('status', status);
-    return this.http.get<PageResponse<PaymentOrder>>(`${environment.apiUrl}/admin/payments`, { params });
+  getPendingOrders(): Observable<PaymentOrder[]> {
+    return this.http.get<any>(`${this.base}/orders/pending`).pipe(map(r => r.data));
   }
 
   confirmPayment(orderId: string, yapeReference: string): Observable<PaymentOrder> {
-    return this.http.patch<PaymentOrder>(`${environment.apiUrl}/admin/payments/${orderId}/confirm`, { yapeReference });
-  }
-
-  rejectPayment(orderId: string, reason: string): Observable<PaymentOrder> {
-    return this.http.patch<PaymentOrder>(`${environment.apiUrl}/admin/payments/${orderId}/reject`, { reason });
+    return this.http.post<any>(`${this.base}/orders/${orderId}/confirm`, { yapeReference }).pipe(map(r => r.data));
   }
 }

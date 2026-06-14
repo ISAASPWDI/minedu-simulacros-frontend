@@ -42,10 +42,10 @@ export class AdminDashboardComponent implements OnInit {
       error: () => {}
     });
 
-    this.paymentService.getPendingOrders(0, 5).subscribe({
-      next: (page) => {
-        this.pendingPayments.set(page.totalElements);
-        this.recentOrders.set(page.content);
+    this.paymentService.getPendingOrders().subscribe({
+      next: (orders) => {
+        this.pendingPayments.set(orders.length);
+        this.recentOrders.set(orders.slice(0, 5));
         this.loading.set(false);
       },
       error: () => this.loading.set(false)

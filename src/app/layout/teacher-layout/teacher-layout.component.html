@@ -3,14 +3,9 @@
 
 <div class="layout-wrapper">
   <aside class="layout-sidebar" [class.open]="sidebarOpen()">
-    <div class="sidebar-logo">
-      <div class="logo-icon">
-        <i class="pi pi-graduation-cap"></i>
-      </div>
-      <div class="logo-text">
-        <span class="logo-title">MINEDU</span>
-        <span class="logo-subtitle">Simulacros 2026</span>
-      </div>
+    <div class="sidebar-brand">
+      <span class="brand-title">Simulacros</span>
+      <span class="brand-sub">MINEDU 2026</span>
     </div>
 
     <nav class="sidebar-nav">
@@ -31,9 +26,8 @@
 
     <div class="sidebar-footer">
       <div class="user-info">
-        <div class="user-avatar">{{ userInitials }}</div>
         <div class="user-details">
-          <span class="user-name">{{ currentUser()?.firstName }} {{ currentUser()?.lastName }}</span>
+          <span class="user-name">{{ currentUser()?.profile?.firstName }} {{ currentUser()?.profile?.lastName }}</span>
           <span class="user-role">Docente</span>
         </div>
       </div>
@@ -47,11 +41,10 @@
       <div class="topbar-brand">Simulacros Docente</div>
       <div class="topbar-spacer"></div>
       <div class="topbar-user">
-        @if (subscription()?.active) {
+        @if (subscription()?.isActive) {
           <p-badge [value]="subscription()!.planName" severity="success" styleClass="plan-badge"></p-badge>
         }
-        <div class="topbar-avatar">{{ userInitials }}</div>
-        <span class="topbar-username">{{ currentUser()?.firstName }}</span>
+        <span class="topbar-username">{{ currentUser()?.profile?.firstName }}</span>
       </div>
     </header>
 

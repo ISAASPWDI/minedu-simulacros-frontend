@@ -1,86 +1,92 @@
+export interface ExamConfigInfo {
+  id: string;
+  code: string;
+  year: number;
+  specialty: string;
+  level: string;
+  escala: string;
+}
+
 export interface ExamSession {
   id: string;
-  examId: string;
-  userId: string;
-  escalaMagisterial: string;
-  status: 'IN_PROGRESS' | 'COMPLETED' | 'ABANDONED';
+  escala: string;
+  status: 'IN_PROGRESS' | 'COMPLETED' | 'ABANDONED' | 'TIMED_OUT';
   startedAt: string;
   finishedAt?: string;
   durationMinutes: number;
-  timeRemainingSeconds: number;
 }
 
 export interface SessionStart {
-  session: ExamSession;
+  sessionId: string;
+  examConfig: ExamConfigInfo;
   questions: QuestionForSession[];
   durationMinutes: number;
+  startedAt: string;
 }
 
 export interface QuestionForSession {
   id: string;
   number: number;
-  text: string;
+  questionText: string;
   optionA: string;
   optionB: string;
   optionC: string;
-  groupContextText?: string;
+  groupId?: string;
   answered?: boolean;
   selectedAnswer?: string;
 }
 
 export interface AnswerFeedback {
   questionId: string;
-  selectedAnswer: string;
   answered: boolean;
 }
 
 export interface SessionResult {
   sessionId: string;
-  examCode: string;
-  examYear: number;
-  escalaMagisterial: string;
+  status: string;
   totalQuestions: number;
-  correct: number;
-  incorrect: number;
-  unanswered: number;
+  totalAnswered: number;
+  totalCorrect: number;
+  totalIncorrect: number;
   score: number;
-  minScore: number;
+  passingScore: number;
   passed: boolean;
+  escala: string;
   durationSeconds: number;
-  questions: QuestionResult[];
+  details: QuestionResultDetail[];
 }
 
-export interface QuestionResult {
+export interface QuestionResultDetail {
+  questionId: string;
   number: number;
-  text: string;
+  questionText: string;
   optionA: string;
   optionB: string;
   optionC: string;
   selectedAnswer?: string;
   correctAnswer: string;
-  correct: boolean;
-  groupContextText?: string;
+  isCorrect: boolean;
 }
 
 export interface UserStats {
-  totalSessions: number;
-  passedSessions: number;
-  failedSessions: number;
+  totalExams: number;
+  totalCompleted: number;
+  totalPassed: number;
   averageScore: number;
   bestScore: number;
-  lastSessionDate?: string;
-  scoreHistory: number[];
+  examsByYear: Record<string, number>;
 }
 
 export interface SessionSummary {
-  sessionId: string;
+  id: string;
   examCode: string;
-  examYear: number;
+  year: number;
   specialty: string;
-  escalaMagisterial: string;
+  level: string;
+  escala: string;
+  status: string;
   score: number;
   passed: boolean;
-  status: string;
   startedAt: string;
-  durationSeconds: number;
+  finishedAt?: string;
 }

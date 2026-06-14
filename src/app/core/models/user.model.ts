@@ -1,30 +1,41 @@
 export interface User {
   id: string;
   email: string;
-  firstName: string;
-  lastName: string;
-  dni: string;
-  phone: string;
   role: 'TEACHER' | 'ADMIN';
-  active: boolean;
+  isActive: boolean;
   createdAt: string;
   profile?: TeacherProfile;
 }
 
 export interface TeacherProfile {
+  id: string;
+  userId: string;
+  firstName: string;
+  lastName: string;
+  dni: string;
+  phone: string;
   escalaMagisterial: string;
   specialtyInterest: string;
-  region: string;
-  ugel: string;
-  institution: string;
-  bio: string;
-  avatarUrl: string;
+  region: string | null;
+  ugel: string | null;
+  institution: string | null;
+  bio: string | null;
+  avatarUrl: string | null;
+}
+
+export interface AuthTokenData {
+  accessToken: string;
+  refreshToken: string;
+  expiresIn: number;
+  user: User;
 }
 
 export interface AuthResponse {
-  token: string;
-  type: string;
-  user: User;
+  success: boolean;
+  message: string;
+  data: AuthTokenData;
+  status: number;
+  timestamp: string;
 }
 
 export interface LoginRequest {

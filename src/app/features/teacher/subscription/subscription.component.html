@@ -1,14 +1,14 @@
 <p-toast />
 <app-page-header title="Mi Suscripción" [breadcrumb]="['Inicio', 'Suscripción']" />
 
-@if (subscription()?.active) {
+@if (subscription()?.isActive) {
   <div class="active-sub-banner">
     <div class="sub-icon"><i class="pi pi-check-circle"></i></div>
     <div class="sub-info">
       <div class="sub-plan">{{ subscription()!.planName }}</div>
       <div class="sub-dates">
-        Válida hasta {{ subscription()!.endDate | date:'dd/MM/yyyy' }} —
-        <strong>{{ subscription()!.daysRemaining }} días restantes</strong>
+        Válida hasta {{ subscription()!.expiresAt | date:'dd/MM/yyyy' }} —
+        <strong>{{ daysRemaining }} días restantes</strong>
       </div>
     </div>
     <p-tag value="Activa" severity="success" />
@@ -37,11 +37,11 @@
           </div>
           <div class="plan-duration">{{ plan.durationDays }} días de acceso</div>
           <div class="plan-description">{{ plan.description }}</div>
-          <ul class="plan-features">
-            @for (feature of plan.features; track feature) {
-              <li><i class="pi pi-check"></i> {{ feature }}</li>
-            }
-          </ul>
+          @if (plan.features) {
+            <ul class="plan-features">
+              <li><i class="pi pi-check"></i> {{ plan.features }}</li>
+            </ul>
+          }
           <button pButton label="Suscribirme" icon="pi pi-credit-card" class="w-full mt-3"></button>
         </div>
       </div>
@@ -93,11 +93,11 @@
         <div class="yape-info">
           <div class="yape-title">Paga por Yape:</div>
           <div class="yape-details">
-            <span><i class="pi pi-phone"></i> {{ yapeInfo()!.phone }}</span>
-            <span><i class="pi pi-user"></i> {{ yapeInfo()!.holderName }}</span>
+            <span><i class="pi pi-phone"></i> {{ yapeInfo()!.yape_phone }}</span>
+            <span><i class="pi pi-user"></i> {{ yapeInfo()!.yape_name }}</span>
           </div>
-          @if (yapeInfo()!.qrImageUrl) {
-            <img [src]="yapeInfo()!.qrImageUrl" alt="QR Yape" class="yape-qr" />
+          @if (yapeInfo()!.yape_qr_url) {
+            <img [src]="yapeInfo()!.yape_qr_url" alt="QR Yape" class="yape-qr" />
           }
         </div>
       }

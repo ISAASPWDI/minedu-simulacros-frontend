@@ -12,16 +12,15 @@
       </div>
       <div class="hero-score">{{ result()!.score.toFixed(2) }}</div>
       <div class="hero-meta">
-        Examen {{ result()!.examCode }} — {{ result()!.examYear }} |
-        Escala: {{ result()!.escalaMagisterial | escala }} |
-        Puntaje mínimo: {{ result()!.minScore }}
+        Escala: {{ result()!.escala | escala }} |
+        Puntaje mínimo: {{ result()!.passingScore }}
       </div>
     </div>
 
     <div class="score-progress">
       <div class="progress-label">
         <span>Tu puntaje: {{ result()!.score.toFixed(2) }}</span>
-        <span>Mínimo: {{ result()!.minScore }}</span>
+        <span>Mínimo: {{ result()!.passingScore }}</span>
         <span>Máximo: 100</span>
       </div>
       <p-progressBar [value]="scorePercent" [style]="{'height': '20px'}" />
@@ -31,21 +30,21 @@
       <div class="col-6 md:col-3">
         <div class="stat-pill correct">
           <i class="pi pi-check"></i>
-          <span class="value">{{ result()!.correct }}</span>
+          <span class="value">{{ result()!.totalCorrect }}</span>
           <span class="label">Correctas</span>
         </div>
       </div>
       <div class="col-6 md:col-3">
         <div class="stat-pill incorrect">
           <i class="pi pi-times"></i>
-          <span class="value">{{ result()!.incorrect }}</span>
+          <span class="value">{{ result()!.totalIncorrect }}</span>
           <span class="label">Incorrectas</span>
         </div>
       </div>
       <div class="col-6 md:col-3">
         <div class="stat-pill unanswered">
           <i class="pi pi-minus"></i>
-          <span class="value">{{ result()!.unanswered }}</span>
+          <span class="value">{{ result()!.totalQuestions - result()!.totalAnswered }}</span>
           <span class="label">Sin responder</span>
         </div>
       </div>
@@ -67,21 +66,18 @@
     <div class="questions-review">
       <h3>Revisión de Preguntas</h3>
       <p-accordion [multiple]="true">
-        @for (q of result()!.questions; track q.number) {
+        @for (q of result()!.details; track q.number) {
           <p-accordion-panel [value]="q.number.toString()">
             <p-accordion-header>
               <div class="q-header">
                 <span class="q-num">{{ q.number }}</span>
-                <i [class]="q.correct ? 'pi pi-check-circle correct-icon' : (!q.selectedAnswer ? 'pi pi-minus-circle unanswered-icon' : 'pi pi-times-circle incorrect-icon')"></i>
-                <span class="q-preview">{{ q.text | slice:0:80 }}...</span>
+                <i [class]="q.isCorrect ? 'pi pi-check-circle correct-icon' : (!q.selectedAnswer ? 'pi pi-minus-circle unanswered-icon' : 'pi pi-times-circle incorrect-icon')"></i>
+                <span class="q-preview">{{ q.questionText | slice:0:80 }}...</span>
               </div>
             </p-accordion-header>
             <p-accordion-content>
               <div class="q-content">
-                @if (q.groupContextText) {
-                  <div class="q-context">{{ q.groupContextText }}</div>
-                }
-                <div class="q-text">{{ q.text }}</div>
+                <div class="q-text">{{ q.questionText }}</div>
                 <div class="answers-list">
                   <div class="answer-row" [class]="getAnswerClass(q)">
                     <span class="answer-label">Tu respuesta:</span>

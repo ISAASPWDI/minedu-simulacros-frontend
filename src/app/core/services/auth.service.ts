@@ -61,7 +61,7 @@ export class AuthService {
   }
 
   saveAuth(response: AuthResponse): void {
-    localStorage.setItem(this.TOKEN_KEY, response.token);
-    localStorage.setItem(this.USER_KEY, JSON.stringify(response.user));
+    localStorage.setItem(this.TOKEN_KEY, response.data.accessToken);
+    localStorage.setItem(this.USER_KEY, JSON.stringify(response.data.user));
   }
 }

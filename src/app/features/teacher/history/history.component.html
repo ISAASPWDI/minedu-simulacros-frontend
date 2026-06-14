@@ -4,14 +4,14 @@
   <div class="col-12 md:col-4">
     <div class="stat-card">
       <div class="stat-icon" style="background: rgba(59,130,246,0.15); color: #3b82f6;"><i class="pi pi-book"></i></div>
-      <div class="stat-value">{{ stats()?.totalSessions ?? 0 }}</div>
+      <div class="stat-value">{{ stats()?.totalExams ?? 0 }}</div>
       <div class="stat-label">Total simulacros</div>
     </div>
   </div>
   <div class="col-12 md:col-4">
     <div class="stat-card">
       <div class="stat-icon" style="background: rgba(34,197,94,0.15); color: #22c55e;"><i class="pi pi-check-circle"></i></div>
-      <div class="stat-value">{{ stats()?.passedSessions ?? 0 }}</div>
+      <div class="stat-value">{{ stats()?.totalPassed ?? 0 }}</div>
       <div class="stat-label">Aprobados</div>
     </div>
   </div>
@@ -50,11 +50,11 @@
     <ng-template pTemplate="body" let-s>
       <tr>
         <td>{{ s.startedAt | date:'dd/MM/yyyy HH:mm' }}</td>
-        <td>{{ s.examCode }} ({{ s.examYear }})</td>
-        <td>{{ s.escalaMagisterial | escala }}</td>
+        <td>{{ s.examCode }} ({{ s.year }})</td>
+        <td>{{ s.escala | escala }}</td>
         <td>
           <span [class.text-green]="s.passed" [class.text-red]="!s.passed && s.status !== 'ABANDONED'">
-            {{ s.score.toFixed(1) }}
+            {{ s.score?.toFixed(1) ?? '—' }}
           </span>
         </td>
         <td>
@@ -63,10 +63,10 @@
             [severity]="getStatusSeverity(s.passed, s.status)"
           />
         </td>
-        <td>{{ formatDuration(s.durationSeconds) }}</td>
+        <td>{{ s.finishedAt ? formatDuration(s.startedAt, s.finishedAt) : '—' }}</td>
         <td>
           <button pButton icon="pi pi-eye" size="small" severity="secondary" text
-            (click)="viewResult(s.sessionId)"
+            (click)="viewResult(s.id)"
             [disabled]="s.status === 'ABANDONED'"
           ></button>
         </td>

@@ -34,18 +34,18 @@
         </td>
         <td>{{ user.profile?.escalaMagisterial | escala }}</td>
         <td>
-          <p-tag [value]="user.active ? 'Activo' : 'Inactivo'" [severity]="user.active ? 'success' : 'secondary'" />
+          <p-tag [value]="user.isActive ? 'Activo' : 'Inactivo'" [severity]="user.isActive ? 'success' : 'secondary'" />
         </td>
         <td>
           <button
             pButton
-            [icon]="user.active ? 'pi pi-ban' : 'pi pi-check'"
-            [severity]="user.active ? 'danger' : 'success'"
+            [icon]="user.isActive ? 'pi pi-ban' : 'pi pi-check'"
+            [severity]="user.isActive ? 'danger' : 'success'"
             size="small"
             text
             [loading]="toggling() === user.id"
             (click)="toggleActive(user)"
-            [pTooltip]="user.active ? 'Desactivar' : 'Activar'"
+            [pTooltip]="user.isActive ? 'Desactivar' : 'Activar'"
           ></button>
         </td>
       </tr>

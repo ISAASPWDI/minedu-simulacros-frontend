@@ -31,26 +31,27 @@ export class ExamService {
   }
 
   getSpecialties(): Observable<Specialty[]> {
-    return this.http.get<Specialty[]>(`${environment.apiUrl}/specialties`);
+    return this.http.get<Specialty[]>(`${this.base}/specialties`);
   }
 
-  createExam(data: Partial<ExamConfig>): Observable<ExamConfig> {
-    return this.http.post<ExamConfig>(`${environment.apiUrl}/admin/exams`, data);
+  createExam(data: any): Observable<ExamConfig> {
+    return this.http.post<ExamConfig>(this.base, data);
   }
 
   bulkCreateQuestions(examId: string, questions: any[]): Observable<any> {
-    return this.http.post(`${environment.apiUrl}/admin/exams/${examId}/questions/bulk`, questions);
+    return this.http.post(`${this.base}/${examId}/questions`, questions);
   }
 
   toggleExamActive(examId: string): Observable<ExamConfig> {
-    return this.http.patch<ExamConfig>(`${environment.apiUrl}/admin/exams/${examId}/toggle`, {});
+    return this.http.put<ExamConfig>(`${this.base}/${examId}/toggle-active`, {});
   }
 
   updateExamDuration(examId: string, durationMinutes: number): Observable<ExamConfig> {
-    return this.http.patch<ExamConfig>(`${environment.apiUrl}/admin/exams/${examId}/duration`, { durationMinutes });
+    const params = new HttpParams().set('minutes', durationMinutes.toString());
+    return this.http.put<ExamConfig>(`${this.base}/${examId}/duration`, null, { params });
   }
 
-  getExamWithAnswers(examId: string): Observable<ExamDetail> {
-    return this.http.get<ExamDetail>(`${environment.apiUrl}/admin/exams/${examId}/answers`);
+  getQuestionsWithAnswers(examId: string): Observable<any[]> {
+    return this.http.get<any[]>(`${this.base}/${examId}/questions-admin`);
   }
 }

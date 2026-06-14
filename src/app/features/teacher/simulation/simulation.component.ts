@@ -84,7 +84,7 @@ export class SimulationComponent implements OnInit, OnDestroy {
     this.questions.set(
       sessionData.questions.map(q => ({ ...q, answered: false, selectedAnswer: undefined }))
     );
-    this.timeRemaining.set(sessionData.session.timeRemainingSeconds);
+    this.timeRemaining.set(sessionData.durationMinutes * 60);
     this.loading.set(false);
     this.startTimer();
   }

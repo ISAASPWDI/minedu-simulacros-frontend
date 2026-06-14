@@ -6,7 +6,7 @@ import { ProgressBarModule } from 'primeng/progressbar';
 import { Accordion, AccordionPanel, AccordionHeader, AccordionContent } from 'primeng/accordion';
 import { TagModule } from 'primeng/tag';
 import { SimulationService } from '../../../core/services/simulation.service';
-import { SessionResult, QuestionResult } from '../../../core/models/simulation.model';
+import { SessionResult, QuestionResultDetail } from '../../../core/models/simulation.model';
 import { EscalaPipe } from '../../../shared/pipes/escala.pipe';
 
 @Component({
@@ -32,21 +32,21 @@ export class ResultsComponent implements OnInit {
     });
   }
 
-  getAnswerLabel(q: QuestionResult, answer?: string): string {
+  getAnswerLabel(q: QuestionResultDetail, answer?: string): string {
     if (!answer) return 'Sin responder';
     const map: Record<string, string> = { A: q.optionA, B: q.optionB, C: q.optionC };
     return `${answer}) ${map[answer] ?? ''}`;
   }
 
-  getAnswerClass(q: QuestionResult): string {
+  getAnswerClass(q: QuestionResultDetail): string {
     if (!q.selectedAnswer) return 'unanswered';
-    return q.correct ? 'correct' : 'incorrect';
+    return q.isCorrect ? 'correct' : 'incorrect';
   }
 
   get scorePercent(): number {
     const r = this.result();
     if (!r) return 0;
-    return Math.round((r.score / 100) * 100);
+    return Math.round((r.score / r.totalQuestions) * 100);
   }
 
   retry(): void {

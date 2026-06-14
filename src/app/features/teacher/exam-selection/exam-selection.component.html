@@ -67,7 +67,7 @@
             </div>
             <div class="meta-item">
               <i class="pi pi-tag"></i>
-              <span>{{ exam.specialty }}</span>
+              <span>{{ exam.specialtyName }}</span>
             </div>
             <div class="meta-item">
               <i class="pi pi-clock"></i>
@@ -105,7 +105,7 @@
   @if (selectedExam()) {
     <div class="dialog-exam-info">
       <div class="exam-title">{{ selectedExam()!.code }} — {{ selectedExam()!.year }}</div>
-      <div class="exam-detail">{{ selectedExam()!.specialty }} | {{ selectedExam()!.level | nivel }}</div>
+      <div class="exam-detail">{{ selectedExam()!.specialtyName }} | {{ selectedExam()!.level | nivel }}</div>
       <div class="exam-detail">{{ selectedExam()!.totalQuestions }} preguntas · {{ selectedExam()!.durationMinutes }} minutos</div>
     </div>
 

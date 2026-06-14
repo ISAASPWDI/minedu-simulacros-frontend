@@ -1,19 +1,20 @@
 @use "primeflex/primeflex.scss";
 
-$font-family: 'Inter', sans-serif;
-$primary: #3B82F6;
-$primary-dark: #2563EB;
-$surface-ground: #0f0f0f;
-$surface-section: #1a1a2e;
-$surface-card: #16213e;
-$surface-overlay: #1a1a2e;
-$text-color: #e2e8f0;
-$text-muted: #94a3b8;
-$border-color: #2d3748;
-$success: #22c55e;
-$danger: #ef4444;
-$warning: #f59e0b;
-$info: #3b82f6;
+$font-family: 'Space Grotesk', sans-serif;
+$font-heading: 'Syne', sans-serif;
+$primary: #FF5724;
+$primary-dark: #EE3D0C;
+$surface-ground: #e8dfd5;
+$surface-section: #ece7e1;
+$surface-card: #f2ede8;
+$surface-overlay: #ece7e1;
+$text-color: #262626;
+$text-muted: #6b6358;
+$border-color: #cdc5bb;
+$success: #1a8a3c;
+$danger: #c0220c;
+$warning: #c97a00;
+$info: #0057cc;
 
 * {
   box-sizing: border-box;
@@ -27,6 +28,11 @@ html, body {
   font-size: 14px;
   background-color: $surface-ground;
   color: $text-color;
+}
+
+h1, h2, h3 {
+  font-family: $font-heading;
+  letter-spacing: -0.02em;
 }
 
 :root {
@@ -89,7 +95,7 @@ html, body {
 
   &:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
   }
 
   .stat-icon {
@@ -106,6 +112,7 @@ html, body {
   .stat-value {
     font-size: 2rem;
     font-weight: 700;
+    font-family: $font-heading;
     color: $text-color;
     line-height: 1;
     margin-bottom: 0.25rem;
@@ -141,19 +148,20 @@ html, body {
   }
 
   &:hover {
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(0, 0, 0, 0.05);
     color: $text-color;
   }
 
   &.active {
-    background: rgba(59, 130, 246, 0.15);
+    background: rgba(255, 87, 36, 0.12);
     color: $primary;
+    font-weight: 600;
   }
 }
 
 .subscription-banner {
-  background: linear-gradient(135deg, #f59e0b22, #f59e0b11);
-  border: 1px solid #f59e0b55;
+  background: rgba(201, 122, 0, 0.1);
+  border: 1px solid rgba(201, 122, 0, 0.4);
   border-radius: 8px;
   padding: 0.75rem 1rem;
   margin: 0 0.75rem 0.75rem;
@@ -161,7 +169,7 @@ html, body {
   align-items: center;
   gap: 0.5rem;
   font-size: 0.8rem;
-  color: #f59e0b;
+  color: $warning;
 }
 
 .page-header {
@@ -170,6 +178,7 @@ html, body {
   h1 {
     font-size: 1.75rem;
     font-weight: 700;
+    font-family: $font-heading;
     color: $text-color;
     margin-bottom: 0.25rem;
   }
@@ -190,22 +199,22 @@ html, body {
 
   &:hover {
     border-color: $primary;
-    background: rgba(59, 130, 246, 0.05);
+    background: rgba(255, 87, 36, 0.04);
   }
 
   &.selected {
     border-color: $primary;
-    background: rgba(59, 130, 246, 0.1);
+    background: rgba(255, 87, 36, 0.08);
   }
 
   &.correct {
     border-color: $success;
-    background: rgba(34, 197, 94, 0.1);
+    background: rgba(26, 138, 60, 0.08);
   }
 
   &.incorrect {
     border-color: $danger;
-    background: rgba(239, 68, 68, 0.1);
+    background: rgba(192, 34, 12, 0.08);
   }
 }
 
@@ -224,19 +233,19 @@ html, body {
     transition: all 0.15s;
 
     &.unanswered {
-      background: #2d3748;
+      background: $border-color;
       color: $text-muted;
     }
 
     &.answered {
-      background: rgba(34, 197, 94, 0.25);
+      background: rgba(26, 138, 60, 0.2);
       color: $success;
     }
 
     &.current {
       background: $primary;
       color: white;
-      box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.4);
+      box-shadow: 0 0 0 2px rgba(255, 87, 36, 0.4);
     }
   }
 }
@@ -260,26 +269,27 @@ html, body {
 
 @keyframes pulse {
   0%, 100% { opacity: 1; }
-  50% { opacity: 0.6; }
+  50% { opacity: 0.5; }
 }
 
 .result-badge {
   font-size: 3rem;
   font-weight: 800;
+  font-family: $font-heading;
   padding: 1rem 2rem;
   border-radius: 16px;
   display: inline-block;
 
   &.passed {
     color: $success;
-    background: rgba(34, 197, 94, 0.1);
-    border: 2px solid rgba(34, 197, 94, 0.3);
+    background: rgba(26, 138, 60, 0.08);
+    border: 2px solid rgba(26, 138, 60, 0.3);
   }
 
   &.failed {
     color: $danger;
-    background: rgba(239, 68, 68, 0.1);
-    border: 2px solid rgba(239, 68, 68, 0.3);
+    background: rgba(192, 34, 12, 0.08);
+    border: 2px solid rgba(192, 34, 12, 0.3);
   }
 }
 
@@ -294,12 +304,13 @@ html, body {
 
   &:hover, &.selected {
     border-color: $primary;
-    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
+    box-shadow: 0 0 0 4px rgba(255, 87, 36, 0.12);
   }
 
   .plan-price {
     font-size: 2.5rem;
     font-weight: 800;
+    font-family: $font-heading;
     color: $primary;
     line-height: 1;
   }

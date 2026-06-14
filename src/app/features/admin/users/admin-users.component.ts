@@ -60,7 +60,7 @@ export class AdminUsersComponent implements OnInit {
       next: (updated) => {
         this.toggling.set(null);
         this.users.update(list => list.map(u => u.id === updated.id ? updated : u));
-        const label = updated.active ? 'activado' : 'desactivado';
+        const label = updated.isActive ? 'activado' : 'desactivado';
         this.messageService.add({ severity: 'success', summary: 'Actualizado', detail: `Usuario ${label} correctamente.` });
       },
       error: () => {

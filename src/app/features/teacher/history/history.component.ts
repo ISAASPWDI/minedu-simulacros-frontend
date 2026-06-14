@@ -82,15 +82,16 @@ export class HistoryComponent implements OnInit {
     return passed ? 'Aprobado' : 'Desaprobado';
   }
 
-  formatDuration(seconds: number): string {
-    const m = Math.floor(seconds / 60);
-    const s = seconds % 60;
+  formatDuration(startedAt: string, finishedAt: string): string {
+    const secs = Math.floor((new Date(finishedAt).getTime() - new Date(startedAt).getTime()) / 1000);
+    const m = Math.floor(secs / 60);
+    const s = secs % 60;
     return `${m}m ${s}s`;
   }
 
   get approvalRate(): number {
     const s = this.stats();
-    if (!s || s.totalSessions === 0) return 0;
-    return Math.round((s.passedSessions / s.totalSessions) * 100);
+    if (!s || s.totalExams === 0) return 0;
+    return Math.round((s.totalPassed / s.totalExams) * 100);
   }
 }
