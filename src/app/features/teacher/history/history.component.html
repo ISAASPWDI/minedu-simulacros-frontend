@@ -31,7 +31,7 @@
   </div>
 
   <p-table
-    [value]="sessions()"
+    [value]="pagedSessions()"
     [loading]="loading()"
     [tableStyle]="{'min-width': '700px'}"
     styleClass="p-datatable-sm"
@@ -65,10 +65,18 @@
         </td>
         <td>{{ s.finishedAt ? formatDuration(s.startedAt, s.finishedAt) : '—' }}</td>
         <td>
-          <button pButton icon="pi pi-eye" size="small" severity="secondary" text
-            (click)="viewResult(s.id)"
-            [disabled]="s.status === 'ABANDONED'"
-          ></button>
+          @if (s.status === 'IN_PROGRESS') {
+            <button pButton icon="pi pi-play" size="small" severity="warn" text
+              pTooltip="Continuar simulacro"
+              (click)="resumeSession(s.id)"
+            ></button>
+          } @else {
+            <button pButton icon="pi pi-eye" size="small" severity="secondary" text
+              pTooltip="Ver resultado"
+              (click)="viewResult(s.id)"
+              [disabled]="s.status === 'ABANDONED'"
+            ></button>
+          }
         </td>
       </tr>
     </ng-template>

@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -7,6 +7,7 @@ import { TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
 import { Select } from 'primeng/select';
 import { PaginatorModule } from 'primeng/paginator';
+import { TooltipModule } from 'primeng/tooltip';
 import { SimulationService } from '../../../core/services/simulation.service';
 import { SessionSummary, UserStats } from '../../../core/models/simulation.model';
 import { EscalaPipe } from '../../../shared/pipes/escala.pipe';
@@ -15,7 +16,7 @@ import { PageHeaderComponent } from '../../../shared/components/page-header/page
 @Component({
   selector: 'app-history',
   standalone: true,
-  imports: [CommonModule, FormsModule, ButtonModule, TableModule, TagModule, Select, PaginatorModule, EscalaPipe, PageHeaderComponent],
+  imports: [CommonModule, FormsModule, ButtonModule, TableModule, TagModule, Select, PaginatorModule, TooltipModule, EscalaPipe, PageHeaderComponent],
   templateUrl: './history.component.html',
   styleUrl: './history.component.scss'
 })
@@ -23,21 +24,35 @@ export class HistoryComponent implements OnInit {
   private simulationService = inject(SimulationService);
   private router = inject(Router);
 
-  sessions = signal<SessionSummary[]>([]);
+  allSessions = signal<SessionSummary[]>([]);
   stats = signal<UserStats | null>(null);
-  totalRecords = signal(0);
   loading = signal(true);
-  currentPage = signal(0);
   pageSize = 10;
+  currentPage = signal(0);
 
   filterStatus = signal<string | null>(null);
 
   statusOptions = [
     { label: 'Todos', value: null },
+    { label: 'En curso', value: 'IN_PROGRESS' },
     { label: 'Aprobado', value: 'COMPLETED_PASSED' },
     { label: 'Desaprobado', value: 'COMPLETED_FAILED' },
     { label: 'Abandonado', value: 'ABANDONED' }
   ];
+
+  filteredSessions = computed(() => {
+    const status = this.filterStatus();
+    if (!status) return this.allSessions();
+    return this.allSessions().filter(s => s.status === status);
+  });
+
+  pagedSessions = computed(() => {
+    const page = this.currentPage();
+    const start = page * this.pageSize;
+    return this.filteredSessions().slice(start, start + this.pageSize);
+  });
+
+  totalRecords = computed(() => this.filteredSessions().length);
 
   ngOnInit(): void {
     this.loadStats();
@@ -53,10 +68,9 @@ export class HistoryComponent implements OnInit {
 
   loadHistory(): void {
     this.loading.set(true);
-    this.simulationService.getHistory(this.currentPage(), this.pageSize).subscribe({
+    this.simulationService.getHistory(0, 200).subscribe({
       next: (page) => {
-        this.sessions.set(page.content);
-        this.totalRecords.set(page.totalElements);
+        this.allSessions.set(page.content);
         this.loading.set(false);
       },
       error: () => this.loading.set(false)
@@ -65,19 +79,24 @@ export class HistoryComponent implements OnInit {
 
   onPageChange(event: any): void {
     this.currentPage.set(event.page);
-    this.loadHistory();
   }
 
   viewResult(sessionId: string): void {
     this.router.navigate(['/teacher/results', sessionId]);
   }
 
-  getStatusSeverity(passed: boolean, status: string): 'success' | 'danger' | 'secondary' {
+  resumeSession(sessionId: string): void {
+    this.router.navigate(['/teacher/simulation', sessionId]);
+  }
+
+  getStatusSeverity(passed: boolean, status: string): 'success' | 'danger' | 'secondary' | 'warn' {
+    if (status === 'IN_PROGRESS') return 'warn';
     if (status === 'ABANDONED') return 'secondary';
     return passed ? 'success' : 'danger';
   }
 
   getStatusLabel(passed: boolean, status: string): string {
+    if (status === 'IN_PROGRESS') return 'En curso';
     if (status === 'ABANDONED') return 'Abandonado';
     return passed ? 'Aprobado' : 'Desaprobado';
   }

@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -15,6 +15,7 @@ import { PaymentService } from '../../../core/services/payment.service';
 import { ExamConfig, Specialty } from '../../../core/models/exam.model';
 import { NivelPipe } from '../../../shared/pipes/nivel.pipe';
 import { PageHeaderComponent } from '../../../shared/components/page-header/page-header.component';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-exam-selection',
@@ -31,15 +32,27 @@ export class ExamSelectionComponent implements OnInit {
   private router = inject(Router);
   private messageService = inject(MessageService);
 
-  exams = signal<ExamConfig[]>([]);
+  allExams = signal<ExamConfig[]>([]);
   years = signal<number[]>([]);
   specialties = signal<Specialty[]>([]);
-  hasSubscription = signal(false);
+  hasSubscription = signal(environment.mockSubscription ?? false);
   loading = signal(true);
 
   filterYear = signal<number | null>(null);
   filterLevel = signal<string | null>(null);
   filterSpecialty = signal<string | null>(null);
+
+  exams = computed(() => {
+    const year = this.filterYear();
+    const level = this.filterLevel();
+    const specialty = this.filterSpecialty();
+    return this.allExams().filter(e => {
+      if (year && e.year !== year) return false;
+      if (level && e.level !== level) return false;
+      if (specialty && e.specialtyName !== specialty) return false;
+      return true;
+    });
+  });
 
   showDialog = signal(false);
   selectedExam = signal<ExamConfig | null>(null);
@@ -66,27 +79,25 @@ export class ExamSelectionComponent implements OnInit {
   ngOnInit(): void {
     this.examService.getYears().subscribe(y => this.years.set(y));
     this.examService.getSpecialties().subscribe(s => this.specialties.set(s));
-    this.paymentService.getSubscription().subscribe({
-      next: (sub) => this.hasSubscription.set(sub?.isActive ?? false),
-      error: () => this.hasSubscription.set(false)
-    });
+    if (!environment.mockSubscription) {
+      this.paymentService.getSubscription().subscribe({
+        next: (sub) => this.hasSubscription.set(sub?.isActive ?? false),
+        error: () => this.hasSubscription.set(false)
+      });
+    }
     this.loadExams();
   }
 
   loadExams(): void {
     this.loading.set(true);
-    const params: any = {};
-    if (this.filterYear()) params.year = this.filterYear();
-    if (this.filterLevel()) params.level = this.filterLevel();
-    if (this.filterSpecialty()) params.specialty = this.filterSpecialty();
-    this.examService.getExams(params).subscribe({
-      next: (page) => { this.exams.set(page.content); this.loading.set(false); },
+    this.examService.getExams().subscribe({
+      next: (page) => { this.allExams.set(page.content); this.loading.set(false); },
       error: () => this.loading.set(false)
     });
   }
 
   onFilterChange(): void {
-    this.loadExams();
+    // filters applied client-side via computed()
   }
 
   openExamDialog(exam: ExamConfig): void {
@@ -102,6 +113,8 @@ export class ExamSelectionComponent implements OnInit {
   startSimulation(): void {
     if (!this.selectedEscala() || !this.selectedExam()) return;
     this.starting.set(true);
+    console.log(this.selectedExam()!.id, this.selectedEscala()!);
+
     this.simulationService.startSession(this.selectedExam()!.id, this.selectedEscala()!).subscribe({
       next: (result) => {
         this.starting.set(false);

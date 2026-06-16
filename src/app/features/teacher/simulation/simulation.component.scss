@@ -130,9 +130,9 @@
     border-radius: 2px;
     flex-shrink: 0;
 
-    &.unanswered { background: #2d3748; }
-    &.answered { background: rgba(34, 197, 94, 0.35); }
-    &.current { background: #3b82f6; }
+    &.unanswered { background: #cdc5bb; }
+    &.answered { background: rgba(26, 138, 60, 0.2); }
+    &.current { background: #FF5724; }
   }
 }
 

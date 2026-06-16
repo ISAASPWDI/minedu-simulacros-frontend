@@ -54,11 +54,54 @@ export class SimulationComponent implements OnInit, OnDestroy {
   });
 
   progressValue = computed(() => {
-    const s = this.session();
-    if (!s) return 0;
-    const total = s.durationMinutes * 60;
-    return Math.round(((total - this.timeRemaining()) / total) * 100);
+    const total = this.questions().length;
+    if (total === 0) return 0;
+    return Math.round((this.answeredCount() / total) * 100);
   });
+
+  private storageKey(id: string): string {
+    return `sim_session_${id}`;
+  }
+
+  private saveToStorage(): void {
+    const id = this.sessionId();
+    if (!id) return;
+    const snapshot = {
+      session: this.session(),
+      questions: this.questions(),
+      startedAt: this.startedAt,
+      currentIndex: this.currentIndex()
+    };
+    localStorage.setItem(this.storageKey(id), JSON.stringify(snapshot));
+  }
+
+  private loadFromStorage(id: string): boolean {
+    const raw = localStorage.getItem(this.storageKey(id));
+    if (!raw) return false;
+    try {
+      const snapshot = JSON.parse(raw);
+      const elapsed = Math.floor((Date.now() - snapshot.startedAt) / 1000);
+      const totalSecs = snapshot.session.durationMinutes * 60;
+      const remaining = totalSecs - elapsed;
+      if (remaining <= 0) {
+        localStorage.removeItem(this.storageKey(id));
+        return false;
+      }
+      this.session.set(snapshot.session);
+      this.questions.set(snapshot.questions);
+      this.startedAt = snapshot.startedAt;
+      this.timeRemaining.set(remaining);
+      this.currentIndex.set(snapshot.currentIndex ?? 0);
+      this.loading.set(false);
+      this.startTimer();
+      return true;
+    } catch {
+      localStorage.removeItem(this.storageKey(id));
+      return false;
+    }
+  }
+
+  private startedAt = 0;
 
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('sessionId') ?? '';
@@ -67,6 +110,8 @@ export class SimulationComponent implements OnInit, OnDestroy {
     const state = window.history.state as { sessionData?: SessionStart };
     if (state?.sessionData) {
       this.initSession(state.sessionData);
+    } else if (id && this.loadFromStorage(id)) {
+      // restored from localStorage — already initialized
     } else {
       this.loading.set(false);
       this.messageService.add({
@@ -82,12 +127,18 @@ export class SimulationComponent implements OnInit, OnDestroy {
   initSession(sessionData: SessionStart): void {
     this.session.set(sessionData);
     this.questions.set(
-      sessionData.questions.map(q => ({ ...q, answered: false, selectedAnswer: undefined }))
+      [...sessionData.questions]
+        .sort((a, b) => a.number - b.number)
+        .map(q => ({ ...q, answered: false, selectedAnswer: undefined }))
     );
+    this.startedAt = Date.now();
     this.timeRemaining.set(sessionData.durationMinutes * 60);
     this.loading.set(false);
+    this.saveToStorage();
     this.startTimer();
   }
+
+  private tickCount = 0;
 
   startTimer(): void {
     this.timerInterval = setInterval(() => {
@@ -98,6 +149,8 @@ export class SimulationComponent implements OnInit, OnDestroy {
         return;
       }
       this.timeRemaining.update(t => t - 1);
+      this.tickCount++;
+      if (this.tickCount % 10 === 0) this.saveToStorage();
     }, 1000);
   }
 
@@ -116,7 +169,7 @@ export class SimulationComponent implements OnInit, OnDestroy {
     ));
 
     this.simulationService.submitAnswer(this.sessionId(), q.id, option).subscribe({
-      next: () => this.submitting.set(false),
+      next: () => { this.submitting.set(false); this.saveToStorage(); },
       error: () => {
         this.submitting.set(false);
         this.questions.update(qs => qs.map(item =>
@@ -152,6 +205,7 @@ export class SimulationComponent implements OnInit, OnDestroy {
 
   finishSession(): void {
     clearInterval(this.timerInterval);
+    localStorage.removeItem(this.storageKey(this.sessionId()));
     this.simulationService.finishSession(this.sessionId()).subscribe({
       next: () => this.router.navigate(['/teacher/results', this.sessionId()]),
       error: (err) => {
