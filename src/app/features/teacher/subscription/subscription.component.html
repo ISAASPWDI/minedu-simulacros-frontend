@@ -110,10 +110,6 @@
       @if (yapeInfo()) {
         <div class="yape-info">
           <div class="yape-title">Paga por Yape:</div>
-          <div class="yape-details">
-            <span><i class="pi pi-phone"></i> {{ yapeInfo()!.yape_phone }}</span>
-            <span><i class="pi pi-user"></i> {{ yapeInfo()!.yape_name }}</span>
-          </div>
           @if (yapeInfo()!.yape_qr_url) {
             <img [src]="yapeInfo()!.yape_qr_url" alt="QR Yape" class="yape-qr" />
           }
