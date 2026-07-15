@@ -35,15 +35,28 @@ export class HistoryComponent implements OnInit {
   statusOptions = [
     { label: 'Todos', value: null },
     { label: 'En curso', value: 'IN_PROGRESS' },
-    { label: 'Aprobado', value: 'COMPLETED_PASSED' },
-    { label: 'Desaprobado', value: 'COMPLETED_FAILED' },
+    { label: 'Aprobado', value: 'PASSED' },
+    { label: 'Desaprobado', value: 'FAILED' },
     { label: 'Abandonado', value: 'ABANDONED' }
   ];
 
   filteredSessions = computed(() => {
+    // Newest first (by start date), regardless of backend order.
+    const list = [...this.allSessions()].sort(
+      (a, b) => new Date(b.startedAt).getTime() - new Date(a.startedAt).getTime()
+    );
     const status = this.filterStatus();
-    if (!status) return this.allSessions();
-    return this.allSessions().filter(s => s.status === status);
+    if (!status) return list;
+    const isFinished = (s: SessionSummary) => s.status === 'COMPLETED' || s.status === 'TIMED_OUT';
+    return list.filter(s => {
+      switch (status) {
+        case 'IN_PROGRESS': return s.status === 'IN_PROGRESS';
+        case 'ABANDONED': return s.status === 'ABANDONED';
+        case 'PASSED': return isFinished(s) && s.passed;
+        case 'FAILED': return isFinished(s) && !s.passed;
+        default: return true;
+      }
+    });
   });
 
   pagedSessions = computed(() => {
@@ -55,8 +68,12 @@ export class HistoryComponent implements OnInit {
   totalRecords = computed(() => this.filteredSessions().length);
 
   ngOnInit(): void {
-    this.loadStats();
-    this.loadHistory();
+    // Heal any expired "En curso" session server-side before loading the list,
+    // so a finished simulacro never lingers as active.
+    this.simulationService.getActiveSession().subscribe({
+      next: () => { this.loadStats(); this.loadHistory(); },
+      error: () => { this.loadStats(); this.loadHistory(); }
+    });
   }
 
   loadStats(): void {

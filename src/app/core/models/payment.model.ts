@@ -32,7 +32,10 @@ export interface PaymentOrder {
   yapeReference: string | null;
   confirmedAt: string | null;
   notes: string | null;
+  paymentImageUrl: string | null;
   createdAt: string;
+  userEmail: string | null;
+  userName: string | null;
 }
 
 export interface YapeQrInfo {

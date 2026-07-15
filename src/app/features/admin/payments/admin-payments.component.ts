@@ -7,6 +7,7 @@ import { TagModule } from 'primeng/tag';
 import { ToastModule } from 'primeng/toast';
 import { DialogModule } from 'primeng/dialog';
 import { InputTextModule } from 'primeng/inputtext';
+import { TooltipModule } from 'primeng/tooltip';
 import { MessageService } from 'primeng/api';
 import { PaymentService } from '../../../core/services/payment.service';
 import { PaymentOrder } from '../../../core/models/payment.model';
@@ -15,7 +16,7 @@ import { PageHeaderComponent } from '../../../shared/components/page-header/page
 @Component({
   selector: 'app-admin-payments',
   standalone: true,
-  imports: [CommonModule, FormsModule, ButtonModule, TableModule, TagModule, ToastModule, DialogModule, InputTextModule, PageHeaderComponent],
+  imports: [CommonModule, FormsModule, ButtonModule, TableModule, TagModule, ToastModule, DialogModule, InputTextModule, TooltipModule, PageHeaderComponent],
   providers: [MessageService],
   templateUrl: './admin-payments.component.html',
   styleUrl: './admin-payments.component.scss'
@@ -26,11 +27,18 @@ export class AdminPaymentsComponent implements OnInit {
 
   orders = signal<PaymentOrder[]>([]);
   loading = signal(true);
+  totalRecords = signal(0);
+  pageSize = 10;
+  currentPage = 0;
 
   showConfirmDialog = signal(false);
+  showRejectDialog = signal(false);
   selectedOrder = signal<PaymentOrder | null>(null);
   yapeReference = signal('');
   confirming = signal(false);
+  rejecting = signal(false);
+  uploadingRejectImage = signal(false);
+  rejectImageUrl = signal<string | null>(null);
 
   ngOnInit(): void {
     this.loadOrders();
@@ -38,10 +46,19 @@ export class AdminPaymentsComponent implements OnInit {
 
   loadOrders(): void {
     this.loading.set(true);
-    this.paymentService.getPendingOrders().subscribe({
-      next: (orders) => { this.orders.set(orders); this.loading.set(false); },
+    this.paymentService.getPendingOrdersPaged(this.currentPage, this.pageSize).subscribe({
+      next: (page) => {
+        this.orders.set(page.content);
+        this.totalRecords.set(page.totalElements);
+        this.loading.set(false);
+      },
       error: () => this.loading.set(false)
     });
+  }
+
+  onPageChange(event: any): void {
+    this.currentPage = event.rows ? event.first / event.rows : 0;
+    this.loadOrders();
   }
 
   openConfirm(order: PaymentOrder): void {
@@ -50,20 +67,65 @@ export class AdminPaymentsComponent implements OnInit {
     this.showConfirmDialog.set(true);
   }
 
+  openReject(order: PaymentOrder): void {
+    this.selectedOrder.set(order);
+    this.rejectImageUrl.set(null);
+    this.showRejectDialog.set(true);
+  }
+
   confirmPayment(): void {
     const order = this.selectedOrder();
     if (!order) return;
     this.confirming.set(true);
     this.paymentService.confirmPayment(order.id, this.yapeReference()).subscribe({
-      next: (updated) => {
+      next: () => {
         this.confirming.set(false);
         this.showConfirmDialog.set(false);
-        this.orders.update(list => list.filter(o => o.id !== updated.id));
+        this.loadOrders();
         this.messageService.add({ severity: 'success', summary: 'Confirmado', detail: 'Pago confirmado y suscripción activada.' });
       },
       error: (err) => {
         this.confirming.set(false);
         this.messageService.add({ severity: 'error', summary: 'Error', detail: err.error?.message || 'No se pudo confirmar el pago.' });
+      }
+    });
+  }
+
+  triggerRejectImageUpload(): void {
+    const input = document.getElementById('rejectImageInput') as HTMLInputElement;
+    input?.click();
+  }
+
+  onRejectImageSelected(event: Event): void {
+    const file = (event.target as HTMLInputElement).files?.[0];
+    if (!file) return;
+    this.uploadingRejectImage.set(true);
+    this.paymentService.uploadPaymentImage(file).subscribe({
+      next: (url) => {
+        this.uploadingRejectImage.set(false);
+        this.rejectImageUrl.set(url);
+      },
+      error: () => {
+        this.uploadingRejectImage.set(false);
+        this.messageService.add({ severity: 'error', summary: 'Error', detail: 'No se pudo subir la imagen.' });
+      }
+    });
+  }
+
+  rejectPayment(): void {
+    const order = this.selectedOrder();
+    if (!order) return;
+    this.rejecting.set(true);
+    this.paymentService.rejectPayment(order.id, this.rejectImageUrl() ?? undefined).subscribe({
+      next: () => {
+        this.rejecting.set(false);
+        this.showRejectDialog.set(false);
+        this.loadOrders();
+        this.messageService.add({ severity: 'warn', summary: 'Rechazado', detail: 'El pago fue rechazado y se notificará al docente.' });
+      },
+      error: (err) => {
+        this.rejecting.set(false);
+        this.messageService.add({ severity: 'error', summary: 'Error', detail: err.error?.message || 'No se pudo rechazar el pago.' });
       }
     });
   }
@@ -75,7 +137,7 @@ export class AdminPaymentsComponent implements OnInit {
   }
 
   getStatusLabel(status: string): string {
-    const map: Record<string, string> = { PENDING: 'Pendiente', COMPLETED: 'Confirmado', FAILED: 'Fallido', REFUNDED: 'Reembolsado' };
+    const map: Record<string, string> = { PENDING: 'Pendiente', COMPLETED: 'Confirmado', FAILED: 'Rechazado', REFUNDED: 'Reembolsado' };
     return map[status] ?? status;
   }
 }

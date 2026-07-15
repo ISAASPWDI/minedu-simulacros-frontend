@@ -74,35 +74,61 @@ export class ProfileComponent implements OnInit {
   });
 
   ngOnInit(): void {
-    const user = this.authService.getCurrentUser();
-    this.currentUser.set(user);
-    if (user) {
-      this.profileForm.patchValue({
-        firstName: user.profile?.firstName ?? '',
-        lastName: user.profile?.lastName ?? '',
-        dni: user.profile?.dni ?? '',
-        phone: user.profile?.phone ?? '',
-        region: user.profile?.region ?? '',
-        ugel: user.profile?.ugel ?? '',
-        institution: user.profile?.institution ?? '',
-        escalaMagisterial: user.profile?.escalaMagisterial ?? '',
-        specialtyInterest: user.profile?.specialtyInterest ?? '',
-        bio: user.profile?.bio ?? ''
-      });
-    }
+    const cached = this.authService.getCurrentUser();
+    this.currentUser.set(cached);
+    if (cached) this.patchForm(cached);
+
+    // Always refresh from the server so previously-saved fields (region, ugel,
+    // institution, bio, ...) are shown even if the login snapshot was stale.
+    this.http.get<{ data: User }>(`${environment.apiUrl}/users/me`).subscribe({
+      next: (res) => {
+        if (res?.data) {
+          this.currentUser.set(res.data);
+          this.authService.updateStoredUser(res.data);
+          this.patchForm(res.data);
+        }
+      },
+      error: () => { /* keep cached values */ }
+    });
+  }
+
+  private patchForm(user: User): void {
+    this.profileForm.patchValue({
+      firstName: user.profile?.firstName ?? '',
+      lastName: user.profile?.lastName ?? '',
+      dni: user.profile?.dni ?? '',
+      phone: user.profile?.phone ?? '',
+      region: user.profile?.region ?? '',
+      ugel: user.profile?.ugel ?? '',
+      institution: user.profile?.institution ?? '',
+      escalaMagisterial: user.profile?.escalaMagisterial ?? '',
+      specialtyInterest: user.profile?.specialtyInterest ?? '',
+      bio: user.profile?.bio ?? ''
+    });
   }
 
   saveProfile(): void {
-    if (this.profileForm.invalid) return;
+    if (this.profileForm.invalid) {
+      this.profileForm.markAllAsTouched();
+      this.messageService.add({ severity: 'warn', summary: 'Campos requeridos', detail: 'Nombre y apellido son obligatorios.' });
+      return;
+    }
     this.saving.set(true);
-    this.http.put(`${environment.apiUrl}/users/me/profile`, this.profileForm.value).subscribe({
-      next: () => {
+    this.http.put<{ data: any }>(`${environment.apiUrl}/users/me/profile`, this.profileForm.value).subscribe({
+      next: (res) => {
         this.saving.set(false);
+        // Keep the cached user in sync with what was just saved.
+        const user = this.currentUser();
+        if (user && res?.data) {
+          const updated: User = { ...user, profile: { ...(user.profile as any), ...res.data } };
+          this.currentUser.set(updated);
+          this.authService.updateStoredUser(updated);
+        }
         this.messageService.add({ severity: 'success', summary: 'Guardado', detail: 'Perfil actualizado correctamente.' });
       },
-      error: () => {
+      error: (err) => {
         this.saving.set(false);
-        this.messageService.add({ severity: 'error', summary: 'Error', detail: 'No se pudo actualizar el perfil.' });
+        this.messageService.add({ severity: 'error', summary: 'Error', detail: err.error?.message || 'No se pudo actualizar el perfil.' });
       }
     });
   }

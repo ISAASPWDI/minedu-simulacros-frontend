@@ -2,7 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { ExamConfig, ExamDetail, Specialty } from '../models/exam.model';
+import { ExamConfig, ExamDetail, QuestionWithAnswer, Specialty } from '../models/exam.model';
 import { PageResponse } from '../models/config.model';
 
 @Injectable({ providedIn: 'root' })
@@ -51,7 +51,25 @@ export class ExamService {
     return this.http.put<ExamConfig>(`${this.base}/${examId}/duration`, null, { params });
   }
 
-  getQuestionsWithAnswers(examId: string): Observable<any[]> {
-    return this.http.get<any[]>(`${this.base}/${examId}/questions-admin`);
+  getQuestionsWithAnswers(examId: string): Observable<QuestionWithAnswer[]> {
+    return this.http.get<QuestionWithAnswer[]>(`${this.base}/${examId}/questions-admin`);
+  }
+
+  addQuestion(examId: string, data: Partial<QuestionWithAnswer>): Observable<QuestionWithAnswer> {
+    return this.http.post<QuestionWithAnswer>(`${this.base}/${examId}/questions/single`, data);
+  }
+
+  updateQuestion(examId: string, questionId: string, data: Partial<QuestionWithAnswer>): Observable<QuestionWithAnswer> {
+    return this.http.put<QuestionWithAnswer>(`${this.base}/${examId}/questions/${questionId}`, data);
+  }
+
+  deleteQuestion(examId: string, questionId: string): Observable<void> {
+    return this.http.delete<void>(`${this.base}/${examId}/questions/${questionId}`);
+  }
+
+  uploadImage(file: File): Observable<string> {
+    const form = new FormData();
+    form.append('file', file);
+    return this.http.post(`${this.base}/images/upload`, form, { responseType: 'text' });
   }
 }

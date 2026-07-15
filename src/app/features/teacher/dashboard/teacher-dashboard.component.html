@@ -100,6 +100,8 @@
         <ng-template pTemplate="header">
           <tr>
             <th>Examen</th>
+            <th>Inicio</th>
+            <th>Fin</th>
             <th>Escala</th>
             <th>Puntaje</th>
             <th>Estado</th>
@@ -109,13 +111,23 @@
         <ng-template pTemplate="body" let-s>
           <tr>
             <td>{{ s.examCode }} ({{ s.year }})</td>
+            <td>{{ s.startedAt | date:'dd/MM/yyyy HH:mm' }}</td>
+            <td>{{ s.finishedAt | date:'dd/MM/yyyy HH:mm' }}</td>
             <td>{{ s.escala | escala }}</td>
             <td>{{ s.score?.toFixed(1) ?? '—' }}</td>
             <td>
-              <p-tag [value]="s.passed ? 'Aprobado' : 'Desaprobado'" [severity]="getPassedSeverity(s.passed)" />
+              @if (s.status === 'IN_PROGRESS') {
+                <p-tag value="En curso" severity="info" />
+              } @else {
+                <p-tag [value]="s.passed ? 'Aprobado' : 'Desaprobado'" [severity]="getPassedSeverity(s.passed)" />
+              }
             </td>
             <td>
-              <button pButton icon="pi pi-eye" size="small" severity="secondary" text (click)="goToResult(s.id)"></button>
+              @if (s.status === 'IN_PROGRESS') {
+                <button pButton icon="pi pi-play" size="small" severity="info" text pTooltip="Continuar" (click)="resumeSession(s.id)"></button>
+              } @else {
+                <button pButton icon="pi pi-eye" size="small" severity="secondary" text pTooltip="Ver resultado" (click)="goToResult(s.id)"></button>
+              }
             </td>
           </tr>
         </ng-template>

@@ -64,4 +64,9 @@ export class AuthService {
     localStorage.setItem(this.TOKEN_KEY, response.data.accessToken);
     localStorage.setItem(this.USER_KEY, JSON.stringify(response.data.user));
   }
+
+  /** Persists an updated user snapshot (e.g. after editing the profile). */
+  updateStoredUser(user: User): void {
+    localStorage.setItem(this.USER_KEY, JSON.stringify(user));
+  }
 }

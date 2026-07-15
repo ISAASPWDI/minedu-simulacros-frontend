@@ -32,8 +32,23 @@ export interface QuestionForSession {
   optionB: string;
   optionC: string;
   groupId?: string;
+  questionImages?: string[];
+  optionAImage?: string;
+  optionBImage?: string;
+  optionCImage?: string;
   answered?: boolean;
   selectedAnswer?: string;
+}
+
+export interface SessionResume {
+  sessionId: string;
+  status: string;
+  finished: boolean;
+  examConfig: ExamConfigInfo;
+  questions: QuestionForSession[];
+  durationMinutes: number;
+  remainingSeconds: number;
+  startedAt: string;
 }
 
 export interface AnswerFeedback {

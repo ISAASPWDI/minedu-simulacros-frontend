@@ -19,6 +19,20 @@ export interface Question {
   optionC: string;
 }
 
+export interface QuestionWithAnswer {
+  id: string;
+  number: number;
+  questionText: string;
+  optionA: string;
+  optionB: string;
+  optionC: string;
+  correctAnswer: 'A' | 'B' | 'C';
+  questionImages: string[];
+  optionAImage: string | null;
+  optionBImage: string | null;
+  optionCImage: string | null;
+}
+
 export interface QuestionGroup {
   id: string;
   contextText: string;

@@ -5,19 +5,22 @@ import { filter } from 'rxjs/operators';
 import { ButtonModule } from 'primeng/button';
 import { ToastModule } from 'primeng/toast';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { TooltipModule } from 'primeng/tooltip';
 import { AuthService } from '../../core/services/auth.service';
+import { NavigationHistoryService } from '../../core/services/navigation-history.service';
 import { User } from '../../core/models/user.model';
 
 @Component({
   selector: 'app-admin-layout',
   standalone: true,
-  imports: [CommonModule, RouterModule, ButtonModule, ToastModule, ConfirmDialogModule],
+  imports: [CommonModule, RouterModule, ButtonModule, ToastModule, ConfirmDialogModule, TooltipModule],
   templateUrl: './admin-layout.component.html',
   styleUrl: './admin-layout.component.scss'
 })
 export class AdminLayoutComponent implements OnInit {
   private authService = inject(AuthService);
   private router = inject(Router);
+  navHistory = inject(NavigationHistoryService);
 
   sidebarOpen = signal(false);
   currentUser = signal<User | null>(null);
@@ -32,11 +35,16 @@ export class AdminLayoutComponent implements OnInit {
   ];
 
   ngOnInit(): void {
+    this.navHistory.init();
     this.currentUser.set(this.authService.getCurrentUser());
     this.router.events.pipe(filter(e => e instanceof NavigationEnd)).subscribe((e: any) => {
       this.currentRoute.set(e.url);
     });
     this.currentRoute.set(this.router.url);
+  }
+
+  goBack(): void {
+    this.navHistory.back('/admin/dashboard');
   }
 
   isActive(route: string): boolean {

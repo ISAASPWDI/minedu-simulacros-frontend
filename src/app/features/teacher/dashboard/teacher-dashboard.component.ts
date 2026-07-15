@@ -1,6 +1,6 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { ChartModule } from 'primeng/chart';
@@ -17,7 +17,7 @@ import { PageHeaderComponent } from '../../../shared/components/page-header/page
 @Component({
   selector: 'app-teacher-dashboard',
   standalone: true,
-  imports: [CommonModule, ButtonModule, CardModule, ChartModule, TagModule, TableModule, SkeletonModule, EscalaPipe, PageHeaderComponent],
+  imports: [CommonModule, RouterLink, ButtonModule, CardModule, ChartModule, TagModule, TableModule, SkeletonModule, EscalaPipe, PageHeaderComponent],
   templateUrl: './teacher-dashboard.component.html',
   styleUrl: './teacher-dashboard.component.scss'
 })
@@ -38,6 +38,20 @@ export class TeacherDashboardComponent implements OnInit {
   }
 
   loadData(): void {
+    // Heal any stale "En curso" session first: the server auto-finishes it if its
+    // time already elapsed, so the dashboard never shows a finished sim as active.
+    this.simulationService.getActiveSession().subscribe({
+      next: () => this.loadStatsAndHistory(),
+      error: () => this.loadStatsAndHistory()
+    });
+
+    this.paymentService.getSubscription().subscribe({
+      next: (sub) => this.subscription.set(sub),
+      error: () => this.subscription.set(null)
+    });
+  }
+
+  private loadStatsAndHistory(): void {
     this.simulationService.getStats().subscribe({
       next: (s) => {
         this.stats.set(s);
@@ -52,11 +66,6 @@ export class TeacherDashboardComponent implements OnInit {
         this.loading.set(false);
       },
       error: () => this.loading.set(false)
-    });
-
-    this.paymentService.getSubscription().subscribe({
-      next: (sub) => this.subscription.set(sub),
-      error: () => this.subscription.set(null)
     });
   }
 
@@ -95,8 +104,21 @@ export class TeacherDashboardComponent implements OnInit {
   }
 
   getStatusLabel(status: string): string {
-    const map: Record<string, string> = { COMPLETED: 'Completado', ABANDONED: 'Abandonado', IN_PROGRESS: 'En progreso' };
+    const map: Record<string, string> = {
+      COMPLETED: 'Completado', ABANDONED: 'Abandonado',
+      IN_PROGRESS: 'En curso', TIMED_OUT: 'Tiempo agotado'
+    };
     return map[status] ?? status;
+  }
+
+  getStatusSeverity(status: string): 'success' | 'danger' | 'warn' | 'info' {
+    if (status === 'COMPLETED') return 'success';
+    if (status === 'IN_PROGRESS') return 'info';
+    return 'danger';
+  }
+
+  resumeSession(sessionId: string): void {
+    this.router.navigate(['/teacher/simulation', sessionId]);
   }
 
   goToExams(): void {

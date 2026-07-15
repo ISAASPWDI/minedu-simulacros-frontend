@@ -6,7 +6,9 @@ import { ButtonModule } from 'primeng/button';
 import { BadgeModule } from 'primeng/badge';
 import { ToastModule } from 'primeng/toast';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { TooltipModule } from 'primeng/tooltip';
 import { AuthService } from '../../core/services/auth.service';
+import { NavigationHistoryService } from '../../core/services/navigation-history.service';
 import { PaymentService } from '../../core/services/payment.service';
 import { UserSubscription } from '../../core/models/payment.model';
 import { User } from '../../core/models/user.model';
@@ -14,7 +16,7 @@ import { User } from '../../core/models/user.model';
 @Component({
   selector: 'app-teacher-layout',
   standalone: true,
-  imports: [CommonModule, RouterModule, ButtonModule, BadgeModule, ToastModule, ConfirmDialogModule],
+  imports: [CommonModule, RouterModule, ButtonModule, BadgeModule, ToastModule, ConfirmDialogModule, TooltipModule],
   templateUrl: './teacher-layout.component.html',
   styleUrl: './teacher-layout.component.scss'
 })
@@ -22,6 +24,7 @@ export class TeacherLayoutComponent implements OnInit {
   private authService = inject(AuthService);
   private paymentService = inject(PaymentService);
   private router = inject(Router);
+  navHistory = inject(NavigationHistoryService);
 
   sidebarOpen = signal(false);
   currentUser = signal<User | null>(null);
@@ -37,6 +40,7 @@ export class TeacherLayoutComponent implements OnInit {
   ];
 
   ngOnInit(): void {
+    this.navHistory.init();
     this.currentUser.set(this.authService.getCurrentUser());
     this.loadSubscription();
     this.router.events.pipe(filter(e => e instanceof NavigationEnd)).subscribe((e: any) => {
@@ -68,6 +72,10 @@ export class TeacherLayoutComponent implements OnInit {
 
   toggleSidebar(): void {
     this.sidebarOpen.set(!this.sidebarOpen());
+  }
+
+  goBack(): void {
+    this.navHistory.back('/teacher/dashboard');
   }
 
   get userInitials(): string {

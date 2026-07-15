@@ -1,0 +1,269 @@
+<p-toast />
+<p-confirmDialog />
+
+<input type="file" id="imageFileInput" accept="image/*" style="display:none" (change)="onImageFileSelected($event)" />
+
+@if (loading()) {
+  <div class="editor-loading">
+    <p-progressSpinner />
+    <p>Cargando examen...</p>
+  </div>
+} @else {
+  <div class="editor-wrapper">
+
+    <!-- Header -->
+    <div class="editor-header">
+      <div class="header-left">
+        <button pButton icon="pi pi-arrow-left" severity="secondary" text size="small" (click)="goBack()"></button>
+        @if (exam()) {
+          <div class="exam-info">
+            <span class="exam-code">{{ exam()!.code }}</span>
+            <span class="exam-meta">{{ exam()!.year }} · {{ exam()!.level === 'PRIMARIA' ? 'EBR Primaria' : 'EBR Secundaria' }} · Forma {{ exam()!.formNumber }}</span>
+          </div>
+        }
+      </div>
+      <div class="header-right">
+        <span class="questions-count">{{ questions().length }} preguntas</span>
+        <button pButton label="Agregar pregunta" icon="pi pi-plus" severity="success" size="small" (click)="openAddDialog()"></button>
+      </div>
+    </div>
+
+    <div class="editor-body">
+
+      <!-- Panel izquierdo: mapa de preguntas -->
+      <aside class="editor-nav">
+        <div class="nav-title">Preguntas</div>
+        <div class="question-nav-grid">
+          @for (q of questions(); track q.id; let i = $index) {
+            <button
+              class="q-btn"
+              [class.current]="i === currentIndex()"
+              [class.has-image]="q.questionImages.length || q.optionAImage || q.optionBImage || q.optionCImage"
+              (click)="goToQuestion(i)"
+              [title]="'P' + q.number + ((q.questionImages.length || q.optionAImage || q.optionBImage || q.optionCImage) ? ' (con imagen)' : '')"
+            >{{ q.number }}</button>
+          }
+        </div>
+        <div class="nav-legend">
+          <div class="legend-item"><span class="legend-dot current"></span> Actual</div>
+          <div class="legend-item"><span class="legend-dot has-image"></span> Con imagen</div>
+        </div>
+      </aside>
+
+      <!-- Panel principal: editor de la pregunta -->
+      <main class="editor-main">
+        @if (editData()) {
+          <div class="question-editor">
+
+            <!-- Cabecera de la pregunta -->
+            <div class="question-editor-header">
+              <div class="question-num-badge">Pregunta {{ editData()!.number }}</div>
+              <div class="question-actions">
+                @if (isDirty()) {
+                  <button pButton label="Guardar cambios" icon="pi pi-save" [loading]="saving()" (click)="saveQuestion()"></button>
+                  <button pButton label="Descartar" icon="pi pi-times" severity="secondary" text (click)="initEditData(currentQuestion())"></button>
+                }
+                <button pButton icon="pi pi-trash" severity="danger" text pTooltip="Eliminar pregunta"
+                  [loading]="deletingQuestion()" (click)="confirmDeleteQuestion()"></button>
+              </div>
+            </div>
+
+            @if (isDirty()) {
+              <div class="dirty-banner">
+                <i class="pi pi-exclamation-circle"></i> Hay cambios sin guardar
+              </div>
+            }
+
+            <!-- Número de pregunta -->
+            <div class="field-group">
+              <label class="field-label">Número de pregunta</label>
+              <input pInputText type="number" [(ngModel)]="editData()!.number" (ngModelChange)="onFieldChange()" class="field-input-sm" />
+            </div>
+
+            <!-- Texto de la pregunta -->
+            <div class="field-group">
+              <label class="field-label">Enunciado</label>
+              <textarea
+                pTextarea
+                [(ngModel)]="editData()!.questionText"
+                (ngModelChange)="onFieldChange()"
+                rows="4"
+                class="field-textarea"
+                placeholder="Escribe el enunciado de la pregunta..."
+              ></textarea>
+            </div>
+
+            <!-- Imágenes de la pregunta (varias) -->
+            <div class="field-group">
+              <label class="field-label">Imágenes de la pregunta</label>
+              @if (editData()!.questionImages.length) {
+                <div class="image-gallery">
+                  @for (img of editData()!.questionImages; track img; let idx = $index) {
+                    <div class="image-thumb">
+                      <img [src]="img" alt="Imagen de pregunta" class="preview-img" />
+                      <button pButton icon="pi pi-times" severity="danger" text size="small" class="thumb-remove"
+                        pTooltip="Quitar imagen" (click)="removeQuestionImage(idx)"></button>
+                    </div>
+                  }
+                </div>
+              }
+              <button pButton label="Agregar imagen(es)" icon="pi pi-upload" severity="info" size="small"
+                [loading]="uploadingImage()" (click)="triggerImageUpload('question')"></button>
+            </div>
+
+            <!-- Opciones -->
+            <div class="options-editor">
+              <div class="option-row">
+                <div class="option-letter-badge" [class.correct]="editData()!.correctAnswer === 'A'">A</div>
+                <div class="option-body">
+                  <textarea
+                    pTextarea
+                    [(ngModel)]="editData()!.optionA"
+                    (ngModelChange)="onFieldChange()"
+                    rows="2"
+                    class="option-textarea"
+                    placeholder="Texto de la opción A (opcional si usas imagen)..."
+                  ></textarea>
+                  @if (editData()!.optionAImage) {
+                    <div class="option-image-thumb">
+                      <img [src]="editData()!.optionAImage!" alt="Opción A" class="preview-img-sm" />
+                      <button pButton icon="pi pi-times" severity="danger" text size="small" pTooltip="Quitar imagen" (click)="removeOptionImage('A')"></button>
+                    </div>
+                  } @else {
+                    <button pButton label="Imagen" icon="pi pi-image" severity="secondary" text size="small" [loading]="uploadingImage()" (click)="triggerImageUpload('A')"></button>
+                  }
+                </div>
+                <button
+                  pButton
+                  [icon]="editData()!.correctAnswer === 'A' ? 'pi pi-check-circle' : 'pi pi-circle'"
+                  [severity]="editData()!.correctAnswer === 'A' ? 'success' : 'secondary'"
+                  text
+                  pTooltip="Marcar como correcta"
+                  (click)="editData()!.correctAnswer = 'A'; onFieldChange()"
+                ></button>
+              </div>
+              <div class="option-row">
+                <div class="option-letter-badge" [class.correct]="editData()!.correctAnswer === 'B'">B</div>
+                <div class="option-body">
+                  <textarea
+                    pTextarea
+                    [(ngModel)]="editData()!.optionB"
+                    (ngModelChange)="onFieldChange()"
+                    rows="2"
+                    class="option-textarea"
+                    placeholder="Texto de la opción B (opcional si usas imagen)..."
+                  ></textarea>
+                  @if (editData()!.optionBImage) {
+                    <div class="option-image-thumb">
+                      <img [src]="editData()!.optionBImage!" alt="Opción B" class="preview-img-sm" />
+                      <button pButton icon="pi pi-times" severity="danger" text size="small" pTooltip="Quitar imagen" (click)="removeOptionImage('B')"></button>
+                    </div>
+                  } @else {
+                    <button pButton label="Imagen" icon="pi pi-image" severity="secondary" text size="small" [loading]="uploadingImage()" (click)="triggerImageUpload('B')"></button>
+                  }
+                </div>
+                <button
+                  pButton
+                  [icon]="editData()!.correctAnswer === 'B' ? 'pi pi-check-circle' : 'pi pi-circle'"
+                  [severity]="editData()!.correctAnswer === 'B' ? 'success' : 'secondary'"
+                  text
+                  pTooltip="Marcar como correcta"
+                  (click)="editData()!.correctAnswer = 'B'; onFieldChange()"
+                ></button>
+              </div>
+              <div class="option-row">
+                <div class="option-letter-badge" [class.correct]="editData()!.correctAnswer === 'C'">C</div>
+                <div class="option-body">
+                  <textarea
+                    pTextarea
+                    [(ngModel)]="editData()!.optionC"
+                    (ngModelChange)="onFieldChange()"
+                    rows="2"
+                    class="option-textarea"
+                    placeholder="Texto de la opción C (opcional si usas imagen)..."
+                  ></textarea>
+                  @if (editData()!.optionCImage) {
+                    <div class="option-image-thumb">
+                      <img [src]="editData()!.optionCImage!" alt="Opción C" class="preview-img-sm" />
+                      <button pButton icon="pi pi-times" severity="danger" text size="small" pTooltip="Quitar imagen" (click)="removeOptionImage('C')"></button>
+                    </div>
+                  } @else {
+                    <button pButton label="Imagen" icon="pi pi-image" severity="secondary" text size="small" [loading]="uploadingImage()" (click)="triggerImageUpload('C')"></button>
+                  }
+                </div>
+                <button
+                  pButton
+                  [icon]="editData()!.correctAnswer === 'C' ? 'pi pi-check-circle' : 'pi pi-circle'"
+                  [severity]="editData()!.correctAnswer === 'C' ? 'success' : 'secondary'"
+                  text
+                  pTooltip="Marcar como correcta"
+                  (click)="editData()!.correctAnswer = 'C'; onFieldChange()"
+                ></button>
+              </div>
+            </div>
+
+            <!-- Respuesta correcta actual -->
+            <div class="correct-answer-badge">
+              <span>Respuesta correcta:</span>
+              <strong class="answer-letter">{{ editData()!.correctAnswer }}</strong>
+            </div>
+
+            <!-- Navegación -->
+            <div class="nav-buttons">
+              <button pButton label="Anterior" icon="pi pi-chevron-left" severity="secondary"
+                [disabled]="currentIndex() === 0" (click)="prevQuestion()"></button>
+              <span class="q-counter">{{ currentIndex() + 1 }} / {{ questions().length }}</span>
+              <button pButton label="Siguiente" iconPos="right" icon="pi pi-chevron-right" severity="secondary"
+                [disabled]="currentIndex() === questions().length - 1" (click)="nextQuestion()"></button>
+            </div>
+
+          </div>
+        } @else {
+          <div class="no-questions">
+            <i class="pi pi-inbox" style="font-size:3rem;color:var(--text-muted)"></i>
+            <p>Este examen no tiene preguntas.</p>
+            <button pButton label="Agregar primera pregunta" icon="pi pi-plus" (click)="openAddDialog()"></button>
+          </div>
+        }
+      </main>
+
+    </div>
+  </div>
+}
+
+<!-- Dialog: Agregar pregunta -->
+<p-dialog header="Nueva Pregunta" [visible]="showAddDialog()" (visibleChange)="showAddDialog.set($event)"
+  [modal]="true" [style]="{'width':'640px'}" [closable]="!addingQuestion()">
+  <div class="add-form">
+    <div class="field-group">
+      <label class="field-label">Número</label>
+      <input pInputText type="number" [ngModel]="newQuestion().number" (ngModelChange)="newQuestion.update(q => ({...q!, number: $event}))" class="field-input-sm" />
+    </div>
+    <div class="field-group">
+      <label class="field-label">Enunciado</label>
+      <textarea pTextarea rows="3" class="field-textarea" placeholder="Enunciado de la pregunta..."
+        [ngModel]="newQuestion().questionText" (ngModelChange)="newQuestion.update(q => ({...q!, questionText: $event}))"></textarea>
+    </div>
+    <div class="options-editor">
+      @for (opt of ['A','B','C']; track opt) {
+        <div class="option-row">
+          <div class="option-letter-badge" [class.correct]="newQuestion().correctAnswer === opt">{{ opt }}</div>
+          <textarea pTextarea rows="2" class="option-textarea" [placeholder]="'Opción ' + opt + '...'"
+            [ngModel]="getNewOptionText(opt)"
+            (ngModelChange)="setNewOptionText(opt, $event)"
+          ></textarea>
+          <button pButton
+            [icon]="newQuestion().correctAnswer === opt ? 'pi pi-check-circle' : 'pi pi-circle'"
+            [severity]="newQuestion().correctAnswer === opt ? 'success' : 'secondary'"
+            text pTooltip="Marcar como correcta"
+            (click)="setNewCorrectAnswer(opt)"
+          ></button>
+        </div>
+      }
+    </div>
+  </div>
+  <ng-template pTemplate="footer">
+    <button pButton label="Cancelar" severity="secondary" text (click)="showAddDialog.set(false)" [disabled]="addingQuestion()"></button>
+    <button pButton label="Agregar" icon="pi pi-plus" [loading]="addingQuestion()" (click)="addQuestion()"></button>
+  </ng-template>
+</p-dialog>

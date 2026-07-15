@@ -3,8 +3,10 @@
 
 <div class="profile-layout">
   <div class="profile-identity">
-    <h2>{{ currentUser()?.profile?.firstName }} {{ currentUser()?.profile?.lastName }}</h2>
-    <p class="profile-email">{{ currentUser()?.email }}</p>
+    <div class="profile-name-row">
+      <h2>{{ currentUser()?.profile?.firstName }} {{ currentUser()?.profile?.lastName }}</h2>
+      <span class="profile-email">{{ currentUser()?.email }}</span>
+    </div>
   </div>
 
   <p-tabs value="0">

@@ -185,6 +185,21 @@
     margin-bottom: 1.5rem;
     font-weight: 500;
   }
+
+  .question-image-container {
+    margin-bottom: 1.5rem;
+    display: flex;
+    justify-content: center;
+
+    .question-image {
+      max-width: 100%;
+      max-height: 420px;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+      object-fit: contain;
+      background: var(--surface-ground);
+    }
+  }
 }
 
 .options-list {
@@ -233,11 +248,26 @@
       color: white;
     }
 
+    .option-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
     .option-text {
       font-size: 0.9rem;
       line-height: 1.6;
       color: var(--text-color);
       flex: 1;
+    }
+
+    .option-image {
+      max-width: 100%;
+      max-height: 220px;
+      align-self: flex-start;
+      border-radius: 6px;
+      border: 1px solid var(--border-color);
     }
   }
 }

@@ -72,6 +72,10 @@ export const routes: Routes = [
         loadComponent: () => import('./features/admin/exams/admin-exams.component').then(m => m.AdminExamsComponent)
       },
       {
+        path: 'exams/:id',
+        loadComponent: () => import('./features/admin/exams/exam-editor/exam-editor.component').then(m => m.ExamEditorComponent)
+      },
+      {
         path: 'config',
         loadComponent: () => import('./features/admin/config/admin-config.component').then(m => m.AdminConfigComponent)
       },

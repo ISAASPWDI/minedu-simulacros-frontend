@@ -6,7 +6,7 @@
 </div>
 
 <div class="exams-card">
-  <p-table [value]="exams()" [loading]="loading()" [tableStyle]="{'min-width': '800px'}" styleClass="p-datatable-sm">
+  <p-table [value]="exams()" [loading]="loading()" [tableStyle]="{'min-width': '800px'}" styleClass="p-datatable-sm" class="data-table-padding">
     <ng-template pTemplate="header">
       <tr>
         <th>Código</th>
@@ -32,7 +32,8 @@
         </td>
         <td>
           <div class="action-row">
-            <button pButton icon="pi pi-upload" size="small" severity="info" text pTooltip="Cargar preguntas" (click)="openUpload(exam)"></button>
+            <button pButton icon="pi pi-pencil" size="small" severity="primary" text pTooltip="Editar preguntas" (click)="openEditor(exam)"></button>
+            <button pButton icon="pi pi-upload" size="small" severity="info" text pTooltip="Cargar preguntas (JSON)" (click)="openUpload(exam)"></button>
             <button pButton icon="pi pi-clock" size="small" severity="secondary" text pTooltip="Cambiar duración" (click)="openDuration(exam)"></button>
             <button pButton
               [icon]="exam.isActive ? 'pi pi-eye-slash' : 'pi pi-eye'"
@@ -41,6 +42,7 @@
               text
               [loading]="toggling() === exam.id"
               (click)="toggleActive(exam)"
+              [pTooltip]="exam.isActive ? 'Desactivar examen' : 'Activar examen'"
             ></button>
           </div>
         </td>

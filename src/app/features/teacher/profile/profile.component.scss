@@ -52,6 +52,30 @@
   }
 }
 
+.profile-identity {
+  margin-bottom: 1.5rem;
+}
+
+.profile-name-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+
+  h2 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text-color);
+    margin: 0;
+  }
+
+  .profile-email {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+  }
+}
+
 .profile-form,
 .password-form {
   padding-top: 1rem;

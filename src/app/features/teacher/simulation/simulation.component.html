@@ -55,6 +55,14 @@
             <div class="question-number">Pregunta {{ currentQuestion()!.number }}</div>
             <div class="question-text">{{ currentQuestion()!.questionText }}</div>
 
+            @if (currentQuestion()!.questionImages?.length) {
+              <div class="question-image-container">
+                @for (img of currentQuestion()!.questionImages; track img) {
+                  <img [src]="img" alt="Imagen de la pregunta" class="question-image" />
+                }
+              </div>
+            }
+
             <div class="options-list">
               <div
                 class="option-card"
@@ -62,7 +70,10 @@
                 (click)="selectAnswer('A')"
               >
                 <div class="option-letter">A</div>
-                <div class="option-text">{{ currentQuestion()!.optionA }}</div>
+                <div class="option-content">
+                  @if (currentQuestion()!.optionA) { <div class="option-text">{{ currentQuestion()!.optionA }}</div> }
+                  @if (currentQuestion()!.optionAImage) { <img [src]="currentQuestion()!.optionAImage" alt="Opción A" class="option-image" /> }
+                </div>
               </div>
               <div
                 class="option-card"
@@ -70,7 +81,10 @@
                 (click)="selectAnswer('B')"
               >
                 <div class="option-letter">B</div>
-                <div class="option-text">{{ currentQuestion()!.optionB }}</div>
+                <div class="option-content">
+                  @if (currentQuestion()!.optionB) { <div class="option-text">{{ currentQuestion()!.optionB }}</div> }
+                  @if (currentQuestion()!.optionBImage) { <img [src]="currentQuestion()!.optionBImage" alt="Opción B" class="option-image" /> }
+                </div>
               </div>
               <div
                 class="option-card"
@@ -78,7 +92,10 @@
                 (click)="selectAnswer('C')"
               >
                 <div class="option-letter">C</div>
-                <div class="option-text">{{ currentQuestion()!.optionC }}</div>
+                <div class="option-content">
+                  @if (currentQuestion()!.optionC) { <div class="option-text">{{ currentQuestion()!.optionC }}</div> }
+                  @if (currentQuestion()!.optionCImage) { <img [src]="currentQuestion()!.optionCImage" alt="Opción C" class="option-image" /> }
+                </div>
               </div>
             </div>
 

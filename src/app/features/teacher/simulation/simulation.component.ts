@@ -112,16 +112,61 @@ export class SimulationComponent implements OnInit, OnDestroy {
       this.initSession(state.sessionData);
     } else if (id && this.loadFromStorage(id)) {
       // restored from localStorage — already initialized
+    } else if (id) {
+      // No local state (e.g. resumed from dashboard/history or after a refresh):
+      // rebuild the session from the server. Expired sessions are auto-finished
+      // server-side, so we simply redirect to the results view.
+      this.resumeFromServer(id);
     } else {
-      this.loading.set(false);
-      this.messageService.add({
-        severity: 'error',
-        summary: 'Error',
-        detail: 'No se pudo cargar la sesión. Inicia el simulacro desde la selección de exámenes.',
-        life: 5000
-      });
-      setTimeout(() => this.router.navigate(['/teacher/exams']), 3000);
+      this.redirectToExams();
     }
+  }
+
+  private resumeFromServer(id: string): void {
+    this.simulationService.resumeSession(id).subscribe({
+      next: (resume) => {
+        if (!resume || resume.finished) {
+          this.router.navigate(['/teacher/results', id]);
+          return;
+        }
+        this.session.set({
+          sessionId: resume.sessionId,
+          examConfig: resume.examConfig,
+          questions: resume.questions,
+          durationMinutes: resume.durationMinutes,
+          startedAt: resume.startedAt
+        });
+        this.questions.set(
+          [...resume.questions]
+            .sort((a, b) => a.number - b.number)
+            .map(q => ({ ...q, answered: !!q.selectedAnswer, selectedAnswer: q.selectedAnswer }))
+        );
+        this.startedAt = Date.now() - (resume.durationMinutes * 60 - resume.remainingSeconds) * 1000;
+        this.timeRemaining.set(resume.remainingSeconds);
+        this.loading.set(false);
+        this.saveToStorage();
+        if (resume.remainingSeconds <= 0) {
+          this.autoFinish();
+        } else {
+          this.startTimer();
+        }
+      },
+      error: () => {
+        this.loading.set(false);
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'No se pudo cargar la sesión. Inicia el simulacro desde la selección de exámenes.',
+          life: 5000
+        });
+        setTimeout(() => this.redirectToExams(), 3000);
+      }
+    });
+  }
+
+  private redirectToExams(): void {
+    this.loading.set(false);
+    this.router.navigate(['/teacher/exams']);
   }
 
   initSession(sessionData: SessionStart): void {
@@ -209,8 +254,15 @@ export class SimulationComponent implements OnInit, OnDestroy {
     this.simulationService.finishSession(this.sessionId()).subscribe({
       next: () => this.router.navigate(['/teacher/results', this.sessionId()]),
       error: (err) => {
-        const msg = err.error?.message || 'Error al finalizar el examen';
-        this.messageService.add({ severity: 'error', summary: 'Error', detail: msg });
+        // If the session already ended (e.g. auto-finished server-side because the
+        // time ran out), the finish call fails — still take the user to the results.
+        const status = err?.status;
+        const msg: string = err?.error?.message || '';
+        if (status === 409 || status === 400 || /progress|not in progress|completed|finaliz/i.test(msg)) {
+          this.router.navigate(['/teacher/results', this.sessionId()]);
+          return;
+        }
+        this.messageService.add({ severity: 'error', summary: 'Error', detail: msg || 'Error al finalizar el examen' });
       }
     });
   }

@@ -1,4 +1,5 @@
 <p-toast />
+<input type="file" id="paymentImageInput" accept="image/*" style="display:none" (change)="onImageSelected($event)" />
 <app-page-header title="Mi Suscripción" [breadcrumb]="['Inicio', 'Suscripción']" />
 
 @if (subscription()?.isActive) {
@@ -12,6 +13,13 @@
       </div>
     </div>
     <p-tag value="Activa" severity="success" />
+  </div>
+}
+
+@if (hasPendingOrder) {
+  <div class="pending-banner">
+    <i class="pi pi-clock"></i>
+    <span>Tienes un pedido de pago <strong>pendiente</strong>. Espera la confirmación del administrador antes de solicitar otro plan.</span>
   </div>
 }
 
@@ -29,7 +37,7 @@
   <div class="grid">
     @for (plan of plans(); track plan.id) {
       <div class="col-12 md:col-4">
-        <div class="plan-card" (click)="selectPlan(plan)">
+        <div class="plan-card" [class.disabled]="hasPendingOrder" (click)="selectPlan(plan)">
           <div class="plan-name">{{ plan.name }}</div>
           <div class="plan-price-row">
             <span class="plan-currency">S/</span>
@@ -39,26 +47,31 @@
           <div class="plan-description">{{ plan.description }}</div>
           @if (plan.features) {
             <ul class="plan-features">
-              <li><i class="pi pi-check"></i> {{ plan.features }}</li>
+              @for (feat of parseFeatures(plan.features); track feat) {
+                <li><i class="pi pi-check"></i> {{ feat }}</li>
+              }
             </ul>
           }
-          <button pButton label="Suscribirme" icon="pi pi-credit-card" class="w-full mt-3"></button>
+          <button pButton label="Suscribirme" icon="pi pi-credit-card" class="w-full mt-3" [disabled]="hasPendingOrder"></button>
         </div>
       </div>
     }
   </div>
 }
 
-@if (orders().length > 0) {
+@if (totalOrders() > 0) {
   <div class="section-title mt-4">Mis pedidos de pago</div>
   <div class="orders-table-wrap">
-    <p-table [value]="orders()" [tableStyle]="{'min-width': '600px'}">
+    <p-table [value]="orders()" [tableStyle]="{'min-width': '600px'}"
+      [paginator]="true" [rows]="orderPageSize" [totalRecords]="totalOrders()"
+      [lazy]="true" (onLazyLoad)="onOrdersPageChange($event)">
       <ng-template pTemplate="header">
         <tr>
           <th>Fecha</th>
           <th>Plan</th>
           <th>Monto</th>
           <th>Estado</th>
+          <th>Observación</th>
         </tr>
       </ng-template>
       <ng-template pTemplate="body" let-o>
@@ -68,6 +81,11 @@
           <td>S/ {{ o.amount }}</td>
           <td>
             <p-tag [value]="getOrderStatusLabel(o.status)" [severity]="getOrderSeverity(o.status)" />
+          </td>
+          <td style="font-size:0.85rem;color:var(--text-muted)">
+            @if (o.status === 'FAILED' && o.notes) {
+              <span style="color:#c0220c">{{ o.notes }}</span>
+            }
           </td>
         </tr>
       </ng-template>
@@ -80,7 +98,7 @@
   [visible]="showPayDialog()"
   (visibleChange)="showPayDialog.set($event)"
   [modal]="true"
-  [style]="{'width': '480px'}"
+  [style]="{'width': '520px'}"
 >
   @if (!createdOrder()) {
     <div class="pay-dialog-content">
@@ -103,8 +121,24 @@
       }
 
       <div class="field mt-3">
-        <label>Referencia / número de operación (opcional)</label>
-        <input pInputText [ngModel]="payNotes()" (ngModelChange)="payNotes.set($event)" placeholder="Ej: 123456789" class="w-full" />
+        <label>Descripción / referencia (opcional)</label>
+        <textarea pTextarea [ngModel]="payNotes()" (ngModelChange)="payNotes.set($event)"
+          rows="2" placeholder="Ej: Pagué a las 10am del 23/06/2026, número de operación 123456..." class="w-full"></textarea>
+      </div>
+
+      <div class="field mt-2">
+        <label>Comprobante de pago (imagen)</label>
+        @if (payImageUrl()) {
+          <div class="proof-uploaded">
+            <img [src]="payImageUrl()!" alt="Comprobante" class="proof-preview" />
+            <div class="proof-actions">
+              <button pButton label="Cambiar" icon="pi pi-upload" severity="secondary" size="small" [loading]="uploadingImage()" (click)="triggerImageUpload()"></button>
+              <button pButton label="Quitar" icon="pi pi-times" severity="danger" size="small" text (click)="payImageUrl.set(null)"></button>
+            </div>
+          </div>
+        } @else {
+          <button pButton label="Subir comprobante" icon="pi pi-upload" severity="secondary" [loading]="uploadingImage()" (click)="triggerImageUpload()"></button>
+        }
       </div>
     </div>
 

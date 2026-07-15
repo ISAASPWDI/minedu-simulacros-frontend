@@ -3,7 +3,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
-import { SessionStart, AnswerFeedback, SessionResult, UserStats, SessionSummary } from '../models/simulation.model';
+import { SessionStart, AnswerFeedback, SessionResult, UserStats, SessionSummary, SessionResume } from '../models/simulation.model';
 import { PageResponse } from '../models/config.model';
 
 @Injectable({ providedIn: 'root' })
@@ -21,6 +21,14 @@ export class SimulationService {
 
   finishSession(sessionId: string): Observable<SessionResult> {
     return this.http.post<any>(`${this.base}/${sessionId}/finish`, {}).pipe(map(r => r.data));
+  }
+
+  resumeSession(sessionId: string): Observable<SessionResume> {
+    return this.http.get<any>(`${this.base}/${sessionId}/resume`).pipe(map(r => r.data));
+  }
+
+  getActiveSession(): Observable<SessionResume | null> {
+    return this.http.get<any>(`${this.base}/active`).pipe(map(r => r.data));
   }
 
   getResult(sessionId: string): Observable<SessionResult> {

@@ -1,5 +1,10 @@
 <p-toast />
+<p-confirmDialog />
 <app-page-header title="Gestión de Usuarios" [breadcrumb]="['Admin', 'Usuarios']" />
+
+<div class="toolbar mb-3">
+  <button pButton label="Nuevo Usuario" icon="pi pi-plus" (click)="openCreate()"></button>
+</div>
 
 <div class="users-card">
   <p-table
@@ -12,6 +17,7 @@
     [lazy]="true"
     (onLazyLoad)="onPageChange($event)"
     styleClass="p-datatable-sm"
+    class="data-table-padding"
   >
     <ng-template pTemplate="header">
       <tr>
@@ -21,32 +27,36 @@
         <th>Rol</th>
         <th>Escala</th>
         <th>Estado</th>
-        <th>Acción</th>
+        <th>Acciones</th>
       </tr>
     </ng-template>
     <ng-template pTemplate="body" let-user>
       <tr>
-        <td>{{ user.firstName }} {{ user.lastName }}</td>
+        <td>{{ user.profile?.firstName ?? '—' }} {{ user.profile?.lastName ?? '' }}</td>
         <td class="text-muted">{{ user.email }}</td>
-        <td>{{ user.dni }}</td>
+        <td>{{ user.profile?.dni ?? '—' }}</td>
         <td>
-          <p-tag [value]="user.role" [severity]="getRoleSeverity(user.role)" />
+          <p-tag [value]="getRoleLabel(user.role)" [severity]="getRoleSeverity(user.role)" />
         </td>
         <td>{{ user.profile?.escalaMagisterial | escala }}</td>
         <td>
           <p-tag [value]="user.isActive ? 'Activo' : 'Inactivo'" [severity]="user.isActive ? 'success' : 'secondary'" />
         </td>
         <td>
-          <button
-            pButton
-            [icon]="user.isActive ? 'pi pi-ban' : 'pi pi-check'"
-            [severity]="user.isActive ? 'danger' : 'success'"
-            size="small"
-            text
-            [loading]="toggling() === user.id"
-            (click)="toggleActive(user)"
-            [pTooltip]="user.isActive ? 'Desactivar' : 'Activar'"
-          ></button>
+          <div class="action-row">
+            <button pButton icon="pi pi-pencil" size="small" severity="info" text
+              pTooltip="Editar usuario" (click)="openEditDialog(user)"></button>
+            <button pButton
+              [icon]="user.isActive ? 'pi pi-ban' : 'pi pi-check'"
+              [severity]="user.isActive ? 'danger' : 'success'"
+              size="small" text
+              [loading]="toggling() === user.id"
+              (click)="toggleActive(user)"
+              [pTooltip]="user.isActive ? 'Desactivar' : 'Activar'"
+            ></button>
+            <button pButton icon="pi pi-trash" size="small" severity="danger" text
+              pTooltip="Eliminar usuario" (click)="confirmDelete(user)"></button>
+          </div>
         </td>
       </tr>
     </ng-template>
@@ -57,3 +67,64 @@
     </ng-template>
   </p-table>
 </div>
+
+<!-- Crear usuario -->
+<p-dialog header="Nuevo Usuario" [visible]="showCreateDialog()" (visibleChange)="showCreateDialog.set($event)" [modal]="true" [style]="{'width':'480px'}" [closable]="!creating()">
+  <div class="create-form">
+    <div class="field-row">
+      <div class="field">
+        <label>Nombre</label>
+        <input pInputText [ngModel]="newUser().firstName" (ngModelChange)="newUser.update(u => ({...u, firstName: $event}))" placeholder="Nombre" class="w-full" />
+      </div>
+      <div class="field">
+        <label>Apellido</label>
+        <input pInputText [ngModel]="newUser().lastName" (ngModelChange)="newUser.update(u => ({...u, lastName: $event}))" placeholder="Apellido" class="w-full" />
+      </div>
+    </div>
+    <div class="field">
+      <label>Email</label>
+      <input pInputText type="email" [ngModel]="newUser().email" (ngModelChange)="newUser.update(u => ({...u, email: $event}))" placeholder="correo@ejemplo.com" class="w-full" />
+    </div>
+    <div class="field">
+      <label>Contraseña</label>
+      <input pInputText type="password" [ngModel]="newUser().password" (ngModelChange)="newUser.update(u => ({...u, password: $event}))" placeholder="Contraseña" class="w-full" />
+    </div>
+    <div class="field">
+      <label>Rol</label>
+      <p-select [ngModel]="newUser().role" (ngModelChange)="newUser.update(u => ({...u, role: $event}))" [options]="roleOptions" styleClass="w-full" appendTo="body" />
+    </div>
+  </div>
+  <ng-template pTemplate="footer">
+    <button pButton label="Cancelar" severity="secondary" text (click)="showCreateDialog.set(false)" [disabled]="creating()"></button>
+    <button pButton label="Crear" icon="pi pi-check" [loading]="creating()" (click)="createUser()"></button>
+  </ng-template>
+</p-dialog>
+
+<!-- Editar usuario -->
+<p-dialog header="Editar Usuario" [visible]="showEditDialog()" (visibleChange)="showEditDialog.set($event)" [modal]="true" [style]="{'width':'420px'}" [closable]="!savingEdit()">
+  @if (editingUser()) {
+    <div style="margin-bottom:1rem;font-size:0.9rem;color:var(--text-muted)">
+      {{ editingUser()!.email }}
+    </div>
+    <div class="create-form">
+      <div class="field-row">
+        <div class="field">
+          <label>Nombre</label>
+          <input pInputText [ngModel]="editForm().firstName" (ngModelChange)="editForm.update(f => ({...f, firstName: $event}))" placeholder="Nombre" class="w-full" />
+        </div>
+        <div class="field">
+          <label>Apellido</label>
+          <input pInputText [ngModel]="editForm().lastName" (ngModelChange)="editForm.update(f => ({...f, lastName: $event}))" placeholder="Apellido" class="w-full" />
+        </div>
+      </div>
+      <div class="field">
+        <label>Rol</label>
+        <p-select [ngModel]="editForm().role" (ngModelChange)="editForm.update(f => ({...f, role: $event}))" [options]="roleOptions" styleClass="w-full" appendTo="body" />
+      </div>
+    </div>
+  }
+  <ng-template pTemplate="footer">
+    <button pButton label="Cancelar" severity="secondary" text (click)="showEditDialog.set(false)" [disabled]="savingEdit()"></button>
+    <button pButton label="Guardar" icon="pi pi-save" [loading]="savingEdit()" (click)="saveEdit()"></button>
+  </ng-template>
+</p-dialog>

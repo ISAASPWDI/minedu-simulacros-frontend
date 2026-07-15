@@ -31,6 +31,9 @@
   <div class="layout-main">
     <header class="layout-topbar">
       <button pButton icon="pi pi-bars" severity="secondary" text class="sidebar-toggle" (click)="toggleSidebar()"></button>
+      @if (navHistory.canGoBack()) {
+        <button pButton icon="pi pi-arrow-left" severity="secondary" text class="back-btn" pTooltip="Volver" (click)="goBack()"></button>
+      }
       <div class="topbar-brand">Panel Administrativo</div>
       <div class="topbar-spacer"></div>
       <div class="topbar-user">

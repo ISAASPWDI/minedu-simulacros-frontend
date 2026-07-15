@@ -1,5 +1,6 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 import { FormsModule, ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { TableModule } from 'primeng/table';
@@ -8,6 +9,7 @@ import { ToastModule } from 'primeng/toast';
 import { DialogModule } from 'primeng/dialog';
 import { InputTextModule } from 'primeng/inputtext';
 import { Select } from 'primeng/select';
+import { TooltipModule } from 'primeng/tooltip';
 import { MessageService } from 'primeng/api';
 import { ExamService } from '../../../core/services/exam.service';
 import { ExamConfig, Specialty } from '../../../core/models/exam.model';
@@ -17,7 +19,7 @@ import { PageHeaderComponent } from '../../../shared/components/page-header/page
 @Component({
   selector: 'app-admin-exams',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, ButtonModule, TableModule, TagModule, ToastModule, DialogModule, InputTextModule, Select, NivelPipe, PageHeaderComponent],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, ButtonModule, TableModule, TagModule, ToastModule, DialogModule, InputTextModule, Select, TooltipModule, NivelPipe, PageHeaderComponent],
   providers: [MessageService],
   templateUrl: './admin-exams.component.html',
   styleUrl: './admin-exams.component.scss'
@@ -26,6 +28,7 @@ export class AdminExamsComponent implements OnInit {
   private examService = inject(ExamService);
   private messageService = inject(MessageService);
   private fb = inject(FormBuilder);
+  private router = inject(Router);
 
   exams = signal<ExamConfig[]>([]);
   specialties = signal<Specialty[]>([]);
@@ -102,6 +105,10 @@ export class AdminExamsComponent implements OnInit {
         this.messageService.add({ severity: 'error', summary: 'Error', detail: 'No se pudo cambiar el estado.' });
       }
     });
+  }
+
+  openEditor(exam: ExamConfig): void {
+    this.router.navigate(['/admin/exams', exam.id]);
   }
 
   openUpload(exam: ExamConfig): void {

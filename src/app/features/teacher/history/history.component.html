@@ -35,11 +35,13 @@
     [loading]="loading()"
     [tableStyle]="{'min-width': '700px'}"
     styleClass="p-datatable-sm"
+    class="data-table-padding"
   >
     <ng-template pTemplate="header">
       <tr>
-        <th>Fecha</th>
         <th>Examen</th>
+        <th>Inicio</th>
+        <th>Fin</th>
         <th>Escala</th>
         <th>Puntaje</th>
         <th>Estado</th>
@@ -49,8 +51,9 @@
     </ng-template>
     <ng-template pTemplate="body" let-s>
       <tr>
-        <td>{{ s.startedAt | date:'dd/MM/yyyy HH:mm' }}</td>
         <td>{{ s.examCode }} ({{ s.year }})</td>
+        <td>{{ s.startedAt | date:'dd/MM/yyyy HH:mm' }}</td>
+        <td>{{ s.finishedAt | date:'dd/MM/yyyy HH:mm' }}</td>
         <td>{{ s.escala | escala }}</td>
         <td>
           <span [class.text-green]="s.passed" [class.text-red]="!s.passed && s.status !== 'ABANDONED'">

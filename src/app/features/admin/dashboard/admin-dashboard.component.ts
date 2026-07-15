@@ -9,7 +9,6 @@ import { ExamService } from '../../../core/services/exam.service';
 import { PaymentService } from '../../../core/services/payment.service';
 import { environment } from '../../../../environments/environment';
 import { PageHeaderComponent } from '../../../shared/components/page-header/page-header.component';
-import { PageResponse } from '../../../core/models/config.model';
 import { PaymentOrder } from '../../../core/models/payment.model';
 
 @Component({
@@ -37,15 +36,16 @@ export class AdminDashboardComponent implements OnInit {
       error: () => {}
     });
 
-    this.http.get<PageResponse<any>>(`${environment.apiUrl}/users?page=0&size=1`).subscribe({
-      next: (page) => this.totalUsers.set(page.totalElements),
-      error: () => {}
+    this.http.get<{ data: number }>(`${environment.apiUrl}/users/count?role=TEACHER`).subscribe({
+      next: (res) => this.totalUsers.set(res.data ?? 0),
+      error: () => this.totalUsers.set(0)
     });
 
-    this.paymentService.getPendingOrders().subscribe({
-      next: (orders) => {
-        this.pendingPayments.set(orders.length);
-        this.recentOrders.set(orders.slice(0, 5));
+    // Latest pending payments first (sorted by createdAt DESC on the backend).
+    this.paymentService.getPendingOrdersPaged(0, 5).subscribe({
+      next: (page) => {
+        this.pendingPayments.set(page.totalElements);
+        this.recentOrders.set(page.content);
         this.loading.set(false);
       },
       error: () => this.loading.set(false)
