@@ -55,15 +55,15 @@ export class ProfileComponent implements OnInit {
   ];
 
   profileForm = this.fb.group({
-    firstName: ['', Validators.required],
-    lastName: ['', Validators.required],
-    dni: [''],
-    phone: [''],
+    firstName: ['', [Validators.required, Validators.minLength(2)]],
+    lastName: ['', [Validators.required, Validators.minLength(2)]],
+    dni: ['', [Validators.required, Validators.pattern(/^\d{8}$/)]],
+    phone: ['', [Validators.required, Validators.pattern(/^\d{9}$/)]],
     region: [''],
     ugel: [''],
     institution: [''],
-    escalaMagisterial: [''],
-    specialtyInterest: [''],
+    escalaMagisterial: ['', Validators.required],
+    specialtyInterest: ['', Validators.required],
     bio: ['']
   });
 
@@ -110,7 +110,7 @@ export class ProfileComponent implements OnInit {
   saveProfile(): void {
     if (this.profileForm.invalid) {
       this.profileForm.markAllAsTouched();
-      this.messageService.add({ severity: 'warn', summary: 'Campos requeridos', detail: 'Nombre y apellido son obligatorios.' });
+      this.messageService.add({ severity: 'warn', summary: 'Campos requeridos', detail: 'Revisa los campos: nombre, apellido, DNI (8 dígitos), teléfono (9 dígitos), escala magisterial y especialidad.' });
       return;
     }
     this.saving.set(true);
@@ -153,5 +153,7 @@ export class ProfileComponent implements OnInit {
       }
     });
   }
+
+  f(name: string) { return this.profileForm.get(name); }
 }
 

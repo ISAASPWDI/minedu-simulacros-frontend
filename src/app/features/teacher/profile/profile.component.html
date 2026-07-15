@@ -22,24 +22,36 @@
               <div class="field">
                 <label>Nombre</label>
                 <input pInputText formControlName="firstName" class="w-full" />
+                @if (f('firstName')?.invalid && f('firstName')?.touched) {
+                  <small class="error-msg">Nombre requerido (mín. 2 caracteres)</small>
+                }
               </div>
             </div>
             <div class="col-12 md:col-6">
               <div class="field">
                 <label>Apellido</label>
                 <input pInputText formControlName="lastName" class="w-full" />
+                @if (f('lastName')?.invalid && f('lastName')?.touched) {
+                  <small class="error-msg">Apellido requerido (mín. 2 caracteres)</small>
+                }
               </div>
             </div>
             <div class="col-12 md:col-6">
               <div class="field">
                 <label>DNI</label>
                 <input pInputText formControlName="dni" class="w-full" maxlength="8" />
+                @if (f('dni')?.invalid && f('dni')?.touched) {
+                  <small class="error-msg">DNI debe tener 8 dígitos</small>
+                }
               </div>
             </div>
             <div class="col-12 md:col-6">
               <div class="field">
                 <label>Teléfono</label>
-                <input pInputText formControlName="phone" class="w-full" />
+                <input pInputText formControlName="phone" class="w-full" maxlength="9" />
+                @if (f('phone')?.invalid && f('phone')?.touched) {
+                  <small class="error-msg">Teléfono debe tener 9 dígitos</small>
+                }
               </div>
             </div>
             <div class="col-12 md:col-6">
@@ -63,13 +75,19 @@
             <div class="col-12 md:col-6">
               <div class="field">
                 <label>Escala Magisterial</label>
-                <p-select formControlName="escalaMagisterial" [options]="escalaOptions" styleClass="w-full" />
+                <p-select formControlName="escalaMagisterial" [options]="escalaOptions" placeholder="Selecciona tu escala" styleClass="w-full" />
+                @if (f('escalaMagisterial')?.invalid && f('escalaMagisterial')?.touched) {
+                  <small class="error-msg">Selecciona tu escala magisterial</small>
+                }
               </div>
             </div>
             <div class="col-12 md:col-6">
               <div class="field">
                 <label>Especialidad de Interés</label>
-                <p-select formControlName="specialtyInterest" [options]="specialtyOptions" styleClass="w-full" />
+                <p-select formControlName="specialtyInterest" [options]="specialtyOptions" placeholder="Selecciona especialidad" styleClass="w-full" />
+                @if (f('specialtyInterest')?.invalid && f('specialtyInterest')?.touched) {
+                  <small class="error-msg">Selecciona una especialidad</small>
+                }
               </div>
             </div>
             <div class="col-12">

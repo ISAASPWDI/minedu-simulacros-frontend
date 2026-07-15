@@ -98,3 +98,10 @@
   display: flex;
   justify-content: flex-end;
 }
+
+.error-msg {
+  display: block;
+  margin-top: 0.35rem;
+  color: #c0220c;
+  font-size: 0.75rem;
+}
