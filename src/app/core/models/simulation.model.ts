@@ -33,9 +33,9 @@ export interface QuestionForSession {
   optionC: string;
   groupId?: string;
   questionImages?: string[];
-  optionAImage?: string;
-  optionBImage?: string;
-  optionCImage?: string;
+  optionAImages?: string[];
+  optionBImages?: string[];
+  optionCImages?: string[];
   answered?: boolean;
   selectedAnswer?: string;
 }

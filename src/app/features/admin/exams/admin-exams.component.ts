@@ -12,6 +12,7 @@ import { Select } from 'primeng/select';
 import { TooltipModule } from 'primeng/tooltip';
 import { MessageService } from 'primeng/api';
 import { ExamService } from '../../../core/services/exam.service';
+import { ConfigService } from '../../../core/services/config.service';
 import { ExamConfig, Specialty } from '../../../core/models/exam.model';
 import { NivelPipe } from '../../../shared/pipes/nivel.pipe';
 import { PageHeaderComponent } from '../../../shared/components/page-header/page-header.component';
@@ -26,9 +27,12 @@ import { PageHeaderComponent } from '../../../shared/components/page-header/page
 })
 export class AdminExamsComponent implements OnInit {
   private examService = inject(ExamService);
+  private configService = inject(ConfigService);
   private messageService = inject(MessageService);
   private fb = inject(FormBuilder);
   private router = inject(Router);
+
+  defaultDurationMinutes = signal(180);
 
   exams = signal<ExamConfig[]>([]);
   specialties = signal<Specialty[]>([]);
@@ -58,13 +62,23 @@ export class AdminExamsComponent implements OnInit {
     year: [new Date().getFullYear(), [Validators.required, Validators.min(2000)]],
     level: ['PRIMARIA', Validators.required],
     specialtyId: ['', Validators.required],
-    formNumber: [1, Validators.required],
-    durationMinutes: [180, [Validators.required, Validators.min(1)]]
+    durationMinutes: [180, [Validators.required, Validators.min(1)]],
+    totalQuestions: [60, [Validators.required, Validators.min(1)]]
   });
 
   ngOnInit(): void {
     this.loadExams();
     this.examService.getSpecialties().subscribe(s => this.specialties.set(s));
+    this.configService.getConfig('exam.default_duration_minutes').subscribe({
+      next: (cfg) => {
+        const minutes = parseInt(cfg.value, 10);
+        if (!isNaN(minutes)) {
+          this.defaultDurationMinutes.set(minutes);
+          this.createForm.patchValue({ durationMinutes: minutes });
+        }
+      },
+      error: () => {}
+    });
   }
 
   loadExams(): void {
@@ -82,7 +96,7 @@ export class AdminExamsComponent implements OnInit {
       next: (exam) => {
         this.creating.set(false);
         this.showCreateDialog.set(false);
-        this.createForm.reset({ year: new Date().getFullYear(), level: 'PRIMARIA', formNumber: 1, durationMinutes: 180 });
+        this.createForm.reset({ year: new Date().getFullYear(), level: 'PRIMARIA', durationMinutes: this.defaultDurationMinutes(), totalQuestions: 60 });
         this.exams.update(list => [exam, ...list]);
         this.messageService.add({ severity: 'success', summary: 'Creado', detail: `Examen ${exam.code} creado.` });
       },

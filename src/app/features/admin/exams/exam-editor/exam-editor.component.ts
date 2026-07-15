@@ -58,9 +58,9 @@ export class ExamEditorComponent implements OnInit {
     optionC: '',
     correctAnswer: 'A',
     questionImages: [],
-    optionAImage: null,
-    optionBImage: null,
-    optionCImage: null
+    optionAImages: [],
+    optionBImages: [],
+    optionCImages: []
   });
 
   answerOptions = [
@@ -146,9 +146,9 @@ export class ExamEditorComponent implements OnInit {
       optionC: q.optionC,
       correctAnswer: q.correctAnswer,
       questionImages: q.questionImages ?? [],
-      optionAImage: q.optionAImage,
-      optionBImage: q.optionBImage,
-      optionCImage: q.optionCImage
+      optionAImages: q.optionAImages ?? [],
+      optionBImages: q.optionBImages ?? [],
+      optionCImages: q.optionCImages ?? []
     }).subscribe({
       next: (updated) => {
         this.saving.set(false);
@@ -190,8 +190,9 @@ export class ExamEditorComponent implements OnInit {
         if (target === 'question') {
           return { ...q, questionImages: [...(q.questionImages ?? []), ...urls] };
         }
-        const key = target === 'A' ? 'optionAImage' : target === 'B' ? 'optionBImage' : 'optionCImage';
-        return { ...q, [key]: urls[0] };
+        // Options accept multiple images, but only one is uploaded per interaction for now.
+        const key = target === 'A' ? 'optionAImages' : target === 'B' ? 'optionBImages' : 'optionCImages';
+        return { ...q, [key]: [...(q[key] ?? []), ...urls] };
       });
       this.isDirty.set(true);
       this.messageService.add({ severity: 'success', summary: 'Imagen subida', detail: 'Imagen actualizada.' });
@@ -211,9 +212,14 @@ export class ExamEditorComponent implements OnInit {
     this.isDirty.set(true);
   }
 
-  removeOptionImage(opt: 'A' | 'B' | 'C'): void {
-    const key = opt === 'A' ? 'optionAImage' : opt === 'B' ? 'optionBImage' : 'optionCImage';
-    this.editData.update(q => q ? { ...q, [key]: null } : q);
+  removeOptionImage(opt: 'A' | 'B' | 'C', index: number): void {
+    const key = opt === 'A' ? 'optionAImages' : opt === 'B' ? 'optionBImages' : 'optionCImages';
+    this.editData.update(q => {
+      if (!q) return q;
+      const imgs = [...(q[key] ?? [])];
+      imgs.splice(index, 1);
+      return { ...q, [key]: imgs };
+    });
     this.isDirty.set(true);
   }
 
@@ -262,9 +268,9 @@ export class ExamEditorComponent implements OnInit {
       optionC: '',
       correctAnswer: 'A',
       questionImages: [],
-      optionAImage: null,
-      optionBImage: null,
-      optionCImage: null
+      optionAImages: [],
+      optionBImages: [],
+      optionCImages: []
     });
     this.showAddDialog.set(true);
   }
@@ -272,11 +278,11 @@ export class ExamEditorComponent implements OnInit {
   addQuestion(): void {
     const nq = this.newQuestion();
     const hasStatement = !!nq.questionText || (nq.questionImages?.length ?? 0) > 0;
-    const optionOk = (text?: string, img?: string | null) => !!(text && text.trim()) || !!img;
+    const optionOk = (text?: string, imgs?: string[]) => !!(text && text.trim()) || (imgs?.length ?? 0) > 0;
     if (!hasStatement
-        || !optionOk(nq.optionA, nq.optionAImage)
-        || !optionOk(nq.optionB, nq.optionBImage)
-        || !optionOk(nq.optionC, nq.optionCImage)) {
+        || !optionOk(nq.optionA, nq.optionAImages)
+        || !optionOk(nq.optionB, nq.optionBImages)
+        || !optionOk(nq.optionC, nq.optionCImages)) {
       this.messageService.add({ severity: 'warn', summary: 'Campos requeridos', detail: 'Cada opción y el enunciado necesitan texto o imagen.' });
       return;
     }

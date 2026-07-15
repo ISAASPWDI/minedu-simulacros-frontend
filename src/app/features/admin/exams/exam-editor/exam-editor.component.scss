@@ -309,10 +309,16 @@ $warning: #c97a00;
       line-height: 1.5;
     }
 
+    .option-image-gallery {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
     .option-image-thumb {
       display: flex;
       align-items: center;
-      gap: 0.5rem;
+      gap: 0.25rem;
 
       .preview-img-sm {
         max-height: 90px;

@@ -4,7 +4,6 @@ export interface ExamConfig {
   year: number;
   level: 'PRIMARIA' | 'SECUNDARIA';
   specialtyName: string;
-  formNumber: number;
   durationMinutes: number;
   totalQuestions: number;
   isActive: boolean;
@@ -28,9 +27,9 @@ export interface QuestionWithAnswer {
   optionC: string;
   correctAnswer: 'A' | 'B' | 'C';
   questionImages: string[];
-  optionAImage: string | null;
-  optionBImage: string | null;
-  optionCImage: string | null;
+  optionAImages: string[];
+  optionBImages: string[];
+  optionCImages: string[];
 }
 
 export interface QuestionGroup {

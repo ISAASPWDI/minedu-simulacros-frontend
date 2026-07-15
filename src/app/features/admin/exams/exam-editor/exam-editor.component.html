@@ -18,7 +18,7 @@
         @if (exam()) {
           <div class="exam-info">
             <span class="exam-code">{{ exam()!.code }}</span>
-            <span class="exam-meta">{{ exam()!.year }} · {{ exam()!.level === 'PRIMARIA' ? 'EBR Primaria' : 'EBR Secundaria' }} · Forma {{ exam()!.formNumber }}</span>
+            <span class="exam-meta">{{ exam()!.year }} · {{ exam()!.level === 'PRIMARIA' ? 'EBR Primaria' : 'EBR Secundaria' }}</span>
           </div>
         }
       </div>
@@ -38,9 +38,9 @@
             <button
               class="q-btn"
               [class.current]="i === currentIndex()"
-              [class.has-image]="q.questionImages.length || q.optionAImage || q.optionBImage || q.optionCImage"
+              [class.has-image]="q.questionImages.length || q.optionAImages.length || q.optionBImages.length || q.optionCImages.length"
               (click)="goToQuestion(i)"
-              [title]="'P' + q.number + ((q.questionImages.length || q.optionAImage || q.optionBImage || q.optionCImage) ? ' (con imagen)' : '')"
+              [title]="'P' + q.number + ((q.questionImages.length || q.optionAImages.length || q.optionBImages.length || q.optionCImages.length) ? ' (con imagen)' : '')"
             >{{ q.number }}</button>
           }
         </div>
@@ -124,14 +124,17 @@
                     class="option-textarea"
                     placeholder="Texto de la opción A (opcional si usas imagen)..."
                   ></textarea>
-                  @if (editData()!.optionAImage) {
-                    <div class="option-image-thumb">
-                      <img [src]="editData()!.optionAImage!" alt="Opción A" class="preview-img-sm" />
-                      <button pButton icon="pi pi-times" severity="danger" text size="small" pTooltip="Quitar imagen" (click)="removeOptionImage('A')"></button>
+                  @if (editData()!.optionAImages.length) {
+                    <div class="option-image-gallery">
+                      @for (img of editData()!.optionAImages; track img; let idx = $index) {
+                        <div class="option-image-thumb">
+                          <img [src]="img" alt="Opción A" class="preview-img-sm" />
+                          <button pButton icon="pi pi-times" severity="danger" text size="small" pTooltip="Quitar imagen" (click)="removeOptionImage('A', idx)"></button>
+                        </div>
+                      }
                     </div>
-                  } @else {
-                    <button pButton label="Imagen" icon="pi pi-image" severity="secondary" text size="small" [loading]="uploadingImage()" (click)="triggerImageUpload('A')"></button>
                   }
+                  <button pButton label="Imagen" icon="pi pi-image" severity="secondary" text size="small" [loading]="uploadingImage()" (click)="triggerImageUpload('A')"></button>
                 </div>
                 <button
                   pButton
@@ -153,14 +156,17 @@
                     class="option-textarea"
                     placeholder="Texto de la opción B (opcional si usas imagen)..."
                   ></textarea>
-                  @if (editData()!.optionBImage) {
-                    <div class="option-image-thumb">
-                      <img [src]="editData()!.optionBImage!" alt="Opción B" class="preview-img-sm" />
-                      <button pButton icon="pi pi-times" severity="danger" text size="small" pTooltip="Quitar imagen" (click)="removeOptionImage('B')"></button>
+                  @if (editData()!.optionBImages.length) {
+                    <div class="option-image-gallery">
+                      @for (img of editData()!.optionBImages; track img; let idx = $index) {
+                        <div class="option-image-thumb">
+                          <img [src]="img" alt="Opción B" class="preview-img-sm" />
+                          <button pButton icon="pi pi-times" severity="danger" text size="small" pTooltip="Quitar imagen" (click)="removeOptionImage('B', idx)"></button>
+                        </div>
+                      }
                     </div>
-                  } @else {
-                    <button pButton label="Imagen" icon="pi pi-image" severity="secondary" text size="small" [loading]="uploadingImage()" (click)="triggerImageUpload('B')"></button>
                   }
+                  <button pButton label="Imagen" icon="pi pi-image" severity="secondary" text size="small" [loading]="uploadingImage()" (click)="triggerImageUpload('B')"></button>
                 </div>
                 <button
                   pButton
@@ -182,14 +188,17 @@
                     class="option-textarea"
                     placeholder="Texto de la opción C (opcional si usas imagen)..."
                   ></textarea>
-                  @if (editData()!.optionCImage) {
-                    <div class="option-image-thumb">
-                      <img [src]="editData()!.optionCImage!" alt="Opción C" class="preview-img-sm" />
-                      <button pButton icon="pi pi-times" severity="danger" text size="small" pTooltip="Quitar imagen" (click)="removeOptionImage('C')"></button>
+                  @if (editData()!.optionCImages.length) {
+                    <div class="option-image-gallery">
+                      @for (img of editData()!.optionCImages; track img; let idx = $index) {
+                        <div class="option-image-thumb">
+                          <img [src]="img" alt="Opción C" class="preview-img-sm" />
+                          <button pButton icon="pi pi-times" severity="danger" text size="small" pTooltip="Quitar imagen" (click)="removeOptionImage('C', idx)"></button>
+                        </div>
+                      }
                     </div>
-                  } @else {
-                    <button pButton label="Imagen" icon="pi pi-image" severity="secondary" text size="small" [loading]="uploadingImage()" (click)="triggerImageUpload('C')"></button>
                   }
+                  <button pButton label="Imagen" icon="pi pi-image" severity="secondary" text size="small" [loading]="uploadingImage()" (click)="triggerImageUpload('C')"></button>
                 </div>
                 <button
                   pButton
