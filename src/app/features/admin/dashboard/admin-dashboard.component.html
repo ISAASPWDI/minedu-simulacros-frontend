@@ -48,37 +48,7 @@
     <button pButton label="Ver todos" severity="secondary" text size="small" (click)="goTo('/admin/payments')"></button>
   </div>
   <div class="card-body">
-    @if (loading()) {
-      <p-skeleton height="3rem" styleClass="mb-2" />
-      <p-skeleton height="3rem" styleClass="mb-2" />
-      <p-skeleton height="3rem" />
-    } @else if (recentOrders().length === 0) {
-      <div class="empty-state">
-        <i class="pi pi-check-circle" style="color:#22c55e;font-size:2.5rem;"></i>
-        <p>No hay pagos pendientes</p>
-      </div>
-    } @else {
-      <table class="simple-table">
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Plan</th>
-            <th>Monto</th>
-            <th>Fecha</th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (o of recentOrders(); track o.id) {
-            <tr>
-              <td class="text-muted" style="font-size:0.8em">{{ o.id | slice:0:8 }}…</td>
-              <td>{{ o.planName }}</td>
-              <td>S/ {{ o.amount }}</td>
-              <td>{{ o.createdAt | date:'dd/MM/yyyy' }}</td>
-            </tr>
-          }
-        </tbody>
-      </table>
-    }
+    <app-pending-payments-panel [limit]="3" />
   </div>
 </div>
 

@@ -9,12 +9,12 @@ import { ExamService } from '../../../core/services/exam.service';
 import { PaymentService } from '../../../core/services/payment.service';
 import { environment } from '../../../../environments/environment';
 import { PageHeaderComponent } from '../../../shared/components/page-header/page-header.component';
-import { PaymentOrder } from '../../../core/models/payment.model';
+import { PendingPaymentsPanelComponent } from '../payments/pending-payments-panel/pending-payments-panel.component';
 
 @Component({
   selector: 'app-admin-dashboard',
   standalone: true,
-  imports: [CommonModule, ButtonModule, TagModule, SkeletonModule, PageHeaderComponent],
+  imports: [CommonModule, ButtonModule, TagModule, SkeletonModule, PageHeaderComponent, PendingPaymentsPanelComponent],
   templateUrl: './admin-dashboard.component.html',
   styleUrl: './admin-dashboard.component.scss'
 })
@@ -28,7 +28,6 @@ export class AdminDashboardComponent implements OnInit {
   totalUsers = signal(0);
   pendingPayments = signal(0);
   loading = signal(true);
-  recentOrders = signal<PaymentOrder[]>([]);
 
   ngOnInit(): void {
     this.examService.getExams({ size: 1 }).subscribe({
@@ -41,11 +40,9 @@ export class AdminDashboardComponent implements OnInit {
       error: () => this.totalUsers.set(0)
     });
 
-    // Latest pending payments first (sorted by createdAt DESC on the backend).
-    this.paymentService.getPendingOrdersPaged(0, 5).subscribe({
+    this.paymentService.getPendingOrdersPaged(0, 1).subscribe({
       next: (page) => {
         this.pendingPayments.set(page.totalElements);
-        this.recentOrders.set(page.content);
         this.loading.set(false);
       },
       error: () => this.loading.set(false)
