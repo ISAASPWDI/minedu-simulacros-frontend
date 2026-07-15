@@ -13,8 +13,16 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
   return next(req).pipe(
     catchError((error: HttpErrorResponse) => {
       if (error.status === 401) {
+        const wasLoggedIn = authService.getCurrentUser() !== null;
         authService.logout();
         router.navigate(['/auth/login']);
+        if (wasLoggedIn) {
+          messageService.add({
+            severity: 'warn',
+            summary: 'Sesión finalizada',
+            detail: error.error?.message || 'Tu sesión ha finalizado. Inicia sesión nuevamente.'
+          });
+        }
       } else if (error.status === 403) {
         messageService.add({ severity: 'error', summary: 'Sin permisos', detail: 'No tienes permisos para realizar esta acción.' });
       } else if (error.status === 0) {
