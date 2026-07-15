@@ -5,6 +5,8 @@ import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { ToastModule } from 'primeng/toast';
 import { SkeletonModule } from 'primeng/skeleton';
+import { ToggleSwitch } from 'primeng/toggleswitch';
+import { TagModule } from 'primeng/tag';
 import { MessageService } from 'primeng/api';
 import { ConfigService } from '../../../core/services/config.service';
 import { SystemConfig } from '../../../core/models/config.model';
@@ -19,7 +21,7 @@ interface EditableConfig extends SystemConfig {
 @Component({
   selector: 'app-admin-config',
   standalone: true,
-  imports: [CommonModule, FormsModule, ButtonModule, InputTextModule, ToastModule, SkeletonModule, PageHeaderComponent],
+  imports: [CommonModule, FormsModule, ButtonModule, InputTextModule, ToastModule, SkeletonModule, ToggleSwitch, TagModule, PageHeaderComponent],
   providers: [MessageService],
   templateUrl: './admin-config.component.html',
   styleUrl: './admin-config.component.scss'
@@ -82,5 +84,9 @@ export class AdminConfigComponent implements OnInit {
     this.configs.update(list => list.map(c =>
       c.key === config.key ? { ...c, editValue: value } : c
     ));
+  }
+
+  isBoolean(value: string): boolean {
+    return value === 'true' || value === 'false';
   }
 }

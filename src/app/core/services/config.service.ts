@@ -16,14 +16,14 @@ export class ConfigService {
     );
   }
 
-  updateConfig(key: string, value: string): Observable<SystemConfig> {
-    return this.http.put<{ data: SystemConfig }>(`${this.base}/${key}`, { value }).pipe(
+  getConfig(key: string): Observable<SystemConfig> {
+    return this.http.get<{ data: SystemConfig }>(`${this.base}/${key}`).pipe(
       map(res => res.data)
     );
   }
 
-  bulkUpdate(configs: { key: string; value: string }[]): Observable<SystemConfig[]> {
-    return this.http.put<{ data: SystemConfig[] }>(`${this.base}/bulk`, configs).pipe(
+  updateConfig(key: string, value: string): Observable<SystemConfig> {
+    return this.http.put<{ data: SystemConfig }>(`${this.base}/${key}`, { value }).pipe(
       map(res => res.data)
     );
   }
