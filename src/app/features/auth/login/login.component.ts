@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
@@ -9,6 +9,7 @@ import { CardModule } from 'primeng/card';
 import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
 import { AuthService } from '../../../core/services/auth.service';
+import { PlatformService } from '../../../core/services/platform.service';
 
 @Component({
   selector: 'app-login',
@@ -18,13 +19,22 @@ import { AuthService } from '../../../core/services/auth.service';
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss'
 })
-export class LoginComponent {
+export class LoginComponent implements OnInit {
   private fb = inject(FormBuilder);
   private authService = inject(AuthService);
+  private platformService = inject(PlatformService);
   private router = inject(Router);
   private messageService = inject(MessageService);
 
   loading = false;
+  platformName = signal('Simulacros Docente');
+
+  ngOnInit(): void {
+    this.platformService.getInfo().subscribe({
+      next: (info) => this.platformName.set(info.name),
+      error: () => {}
+    });
+  }
 
   form = this.fb.group({
     email: ['', [Validators.required, Validators.email]],

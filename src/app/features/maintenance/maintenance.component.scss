@@ -1,0 +1,66 @@
+.maintenance-wrapper {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #e8dfd5;
+  padding: 1rem;
+}
+
+.maintenance-card {
+  width: 100%;
+  max-width: 420px;
+  background: #f2ede8;
+  border: 1px solid #cdc5bb;
+  border-radius: 20px;
+  padding: 2.5rem;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.icon-badge {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: rgba(255, 87, 36, 0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  i {
+    font-size: 1.75rem;
+    color: #FF5724;
+  }
+}
+
+h1 {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #262626;
+  margin: 0;
+  letter-spacing: -0.02em;
+}
+
+p {
+  font-size: 0.9rem;
+  color: #6b6358;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.maintenance-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: 100%;
+  margin-top: 0.5rem;
+
+  button {
+    width: 100%;
+  }
+}

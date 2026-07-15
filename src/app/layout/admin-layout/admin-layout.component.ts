@@ -6,6 +6,7 @@ import { ButtonModule } from 'primeng/button';
 import { ToastModule } from 'primeng/toast';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { TooltipModule } from 'primeng/tooltip';
+import { ConfirmationService } from 'primeng/api';
 import { AuthService } from '../../core/services/auth.service';
 import { NavigationHistoryService } from '../../core/services/navigation-history.service';
 import { User } from '../../core/models/user.model';
@@ -20,6 +21,7 @@ import { User } from '../../core/models/user.model';
 export class AdminLayoutComponent implements OnInit {
   private authService = inject(AuthService);
   private router = inject(Router);
+  private confirmationService = inject(ConfirmationService);
   navHistory = inject(NavigationHistoryService);
 
   sidebarOpen = signal(false);
@@ -57,8 +59,18 @@ export class AdminLayoutComponent implements OnInit {
   }
 
   logout(): void {
-    this.authService.logout();
-    this.router.navigate(['/auth/login']);
+    this.confirmationService.confirm({
+      message: '¿Estás seguro de que deseas cerrar sesión?',
+      header: 'Cerrar sesión',
+      icon: 'pi pi-sign-out',
+      acceptLabel: 'Cerrar sesión',
+      rejectLabel: 'Cancelar',
+      acceptButtonStyleClass: 'p-button-danger',
+      accept: () => {
+        this.authService.logout();
+        this.router.navigate(['/auth/login']);
+      }
+    });
   }
 
   toggleSidebar(): void {

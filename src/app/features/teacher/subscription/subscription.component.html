@@ -107,12 +107,17 @@
         <span>S/ {{ selectedPlan()?.price }} · {{ selectedPlan()?.durationDays }} días</span>
       </div>
 
-      @if (yapeInfo()) {
+      @if (yapeInfo() && yapeInfo()!.yape_qr_enabled === 'true') {
         <div class="yape-info">
           <div class="yape-title">Paga por Yape:</div>
           @if (yapeInfo()!.yape_qr_url) {
             <img [src]="yapeInfo()!.yape_qr_url" alt="QR Yape" class="yape-qr" />
           }
+        </div>
+      } @else if (yapeInfo() && !paymentsAvailable) {
+        <div class="payments-unavailable">
+          <i class="pi pi-info-circle"></i>
+          <span>Pagos no están disponibles en este momento. Intenta más tarde o contacta al administrador.</span>
         </div>
       }
 
@@ -149,7 +154,7 @@
   <ng-template pTemplate="footer">
     @if (!createdOrder()) {
       <button pButton label="Cancelar" severity="secondary" text (click)="closeDialog()"></button>
-      <button pButton label="Registrar pedido" icon="pi pi-send" [loading]="creating()" (click)="createOrder()"></button>
+      <button pButton label="Registrar pedido" icon="pi pi-send" [loading]="creating()" [disabled]="!paymentsAvailable" (click)="createOrder()"></button>
     } @else {
       <button pButton label="Cerrar" (click)="closeDialog()"></button>
     }

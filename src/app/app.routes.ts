@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './core/guards/auth.guard';
 import { adminGuard } from './core/guards/admin.guard';
+import { maintenanceGuard } from './core/guards/maintenance.guard';
 
 export const routes: Routes = [
   { path: '', redirectTo: '/auth/login', pathMatch: 'full' },
@@ -18,8 +19,12 @@ export const routes: Routes = [
     ]
   },
   {
+    path: 'maintenance',
+    loadComponent: () => import('./features/maintenance/maintenance.component').then(m => m.MaintenanceComponent)
+  },
+  {
     path: 'teacher',
-    canActivate: [authGuard],
+    canActivate: [authGuard, maintenanceGuard],
     loadComponent: () => import('./layout/teacher-layout/teacher-layout.component').then(m => m.TeacherLayoutComponent),
     children: [
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },

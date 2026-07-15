@@ -94,6 +94,10 @@ export class SubscriptionComponent implements OnInit {
     return this.orders().some(o => o.status === 'PENDING');
   }
 
+  get paymentsAvailable(): boolean {
+    return this.yapeInfo()?.yape_qr_enabled === 'true';
+  }
+
   selectPlan(plan: SubscriptionPlan): void {
     if (this.hasPendingOrder) {
       this.messageService.add({
@@ -134,7 +138,7 @@ export class SubscriptionComponent implements OnInit {
 
   createOrder(): void {
     const plan = this.selectedPlan();
-    if (!plan) return;
+    if (!plan || !this.paymentsAvailable) return;
     this.confirmationService.confirm({
       header: 'Confirmar pedido',
       message: 'Asegúrate de haber realizado el pago por Yape antes de continuar. Un administrador revisará tu comprobante para activar tu plan. ¿Deseas registrar el pedido?',

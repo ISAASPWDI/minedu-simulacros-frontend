@@ -25,6 +25,8 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
         }
       } else if (error.status === 403) {
         messageService.add({ severity: 'error', summary: 'Sin permisos', detail: 'No tienes permisos para realizar esta acción.' });
+      } else if (error.status === 503) {
+        router.navigate(['/maintenance']);
       } else if (error.status === 0) {
         messageService.add({ severity: 'error', summary: 'Sin conexión', detail: 'No se pudo conectar con el servidor.' });
       } else if (error.status >= 500) {

@@ -39,7 +39,8 @@ export interface PaymentOrder {
 }
 
 export interface YapeQrInfo {
-  yape_phone: string;
-  yape_name: string;
-  yape_qr_url: string;
+  yape_phone?: string;
+  yape_name?: string;
+  yape_qr_url?: string;
+  yape_qr_enabled: string;
 }

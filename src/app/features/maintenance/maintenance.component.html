@@ -1,0 +1,11 @@
+<div class="maintenance-wrapper">
+  <div class="maintenance-card">
+    <div class="icon-badge"><i class="pi pi-wrench"></i></div>
+    <h1>Estamos en mantenimiento</h1>
+    <p>Estamos realizando mejoras en la plataforma. Vuelve a intentarlo en unos minutos.</p>
+    <div class="maintenance-actions">
+      <button pButton label="Reintentar" icon="pi pi-refresh" [loading]="checking()" (click)="retry()"></button>
+      <button pButton label="Cerrar sesión" icon="pi pi-sign-out" severity="secondary" text (click)="logout()"></button>
+    </div>
+  </div>
+</div>
