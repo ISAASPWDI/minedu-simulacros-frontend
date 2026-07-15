@@ -14,10 +14,23 @@ import { TooltipModule } from 'primeng/tooltip';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { MessageService, ConfirmationService } from 'primeng/api';
 import { environment } from '../../../../environments/environment';
+import { AuthService } from '../../../core/services/auth.service';
 import { User } from '../../../core/models/user.model';
 import { PageResponse } from '../../../core/models/config.model';
 import { EscalaPipe } from '../../../shared/pipes/escala.pipe';
 import { PageHeaderComponent } from '../../../shared/components/page-header/page-header.component';
+
+interface UserFormValue {
+  firstName: string;
+  lastName: string;
+  email: string;
+  password: string;
+  dni: string;
+  phone: string;
+  escalaMagisterial: string;
+  specialtyInterest: string;
+  role: string;
+}
 
 @Component({
   selector: 'app-admin-users',
@@ -32,6 +45,7 @@ export class AdminUsersComponent implements OnInit {
   private http = inject(HttpClient);
   private messageService = inject(MessageService);
   private confirmationService = inject(ConfirmationService);
+  private authService = inject(AuthService);
 
   users = signal<User[]>([]);
   totalRecords = signal(0);
@@ -40,21 +54,49 @@ export class AdminUsersComponent implements OnInit {
   currentPage = 0;
   pageSize = 15;
 
+  currentUserId = this.authService.getCurrentUser()?.id ?? null;
+
   // Create user
   showCreateDialog = signal(false);
   creating = signal(false);
-  newUser = signal({ email: '', password: '', firstName: '', lastName: '', role: 'TEACHER' });
+  newUser = signal<UserFormValue>(this.emptyForm());
 
-  // Edit user (name + role)
+  // Edit user
   showEditDialog = signal(false);
   editingUser = signal<User | null>(null);
-  editForm = signal({ firstName: '', lastName: '', role: 'TEACHER' });
+  editForm = signal<Omit<UserFormValue, 'email' | 'password'>>(this.emptyForm());
   savingEdit = signal(false);
 
   roleOptions = [
     { label: 'Docente', value: 'TEACHER' },
     { label: 'Administrador', value: 'ADMIN' }
   ];
+
+  escalaOptions = [
+    { label: '1ra Escala', value: 'PRIMERA' },
+    { label: '2da Escala', value: 'SEGUNDA' },
+    { label: '3ra Escala', value: 'TERCERA' },
+    { label: '4ta Escala', value: 'CUARTA' },
+    { label: '5ta Escala', value: 'QUINTA' },
+    { label: '6ta Escala', value: 'SEXTA' },
+    { label: '7ma Escala', value: 'SEPTIMA' },
+    { label: '8va Escala', value: 'OCTAVA' }
+  ];
+
+  specialtyOptions = [
+    { label: 'Comunicación', value: 'COMUNICACION' },
+    { label: 'Matemática', value: 'MATEMATICA' },
+    { label: 'Ciencias Sociales', value: 'CIENCIAS_SOCIALES' },
+    { label: 'Ciencia y Tecnología', value: 'CIENCIA_TECNOLOGIA' },
+    { label: 'Arte y Cultura', value: 'ARTE_CULTURA' },
+    { label: 'Educación Física', value: 'EDUCACION_FISICA' },
+    { label: 'Inglés', value: 'INGLES' },
+    { label: 'Educación Primaria', value: 'PRIMARIA' }
+  ];
+
+  private emptyForm(): UserFormValue {
+    return { firstName: '', lastName: '', email: '', password: '', dni: '', phone: '', escalaMagisterial: '', specialtyInterest: '', role: 'TEACHER' };
+  }
 
   ngOnInit(): void {
     this.loadUsers();
@@ -76,6 +118,10 @@ export class AdminUsersComponent implements OnInit {
     });
   }
 
+  isCurrentUser(user: User): boolean {
+    return !!this.currentUserId && user.id === this.currentUserId;
+  }
+
   toggleActive(user: User): void {
     this.toggling.set(user.id);
     this.http.put<{ data: User }>(`${environment.apiUrl}/users/${user.id}/toggle-active`, {}).subscribe({
@@ -86,22 +132,22 @@ export class AdminUsersComponent implements OnInit {
         const label = updated.isActive ? 'activado' : 'desactivado';
         this.messageService.add({ severity: 'success', summary: 'Actualizado', detail: `Usuario ${label} correctamente.` });
       },
-      error: () => {
+      error: (err) => {
         this.toggling.set(null);
-        this.messageService.add({ severity: 'error', summary: 'Error', detail: 'No se pudo cambiar el estado del usuario.' });
+        this.messageService.add({ severity: 'error', summary: 'Error', detail: err.error?.message || 'No se pudo cambiar el estado del usuario.' });
       }
     });
   }
 
   openCreate(): void {
-    this.newUser.set({ email: '', password: '', firstName: '', lastName: '', role: 'TEACHER' });
+    this.newUser.set(this.emptyForm());
     this.showCreateDialog.set(true);
   }
 
   createUser(): void {
     const u = this.newUser();
-    if (!u.email || !u.password || !u.firstName || !u.lastName) {
-      this.messageService.add({ severity: 'warn', summary: 'Campos requeridos', detail: 'Completa todos los campos.' });
+    if (!u.email || !u.password || !u.firstName || !u.lastName || !u.dni || !u.escalaMagisterial) {
+      this.messageService.add({ severity: 'warn', summary: 'Campos requeridos', detail: 'Completa nombre, apellido, email, contraseña, DNI y escala magisterial.' });
       return;
     }
     this.creating.set(true);
@@ -125,6 +171,10 @@ export class AdminUsersComponent implements OnInit {
     this.editForm.set({
       firstName: user.profile?.firstName ?? '',
       lastName: user.profile?.lastName ?? '',
+      dni: user.profile?.dni ?? '',
+      phone: user.profile?.phone ?? '',
+      escalaMagisterial: user.profile?.escalaMagisterial ?? '',
+      specialtyInterest: user.profile?.specialtyInterest ?? '',
       role: user.role
     });
     this.showEditDialog.set(true);
@@ -134,8 +184,8 @@ export class AdminUsersComponent implements OnInit {
     const user = this.editingUser();
     if (!user) return;
     const form = this.editForm();
-    if (!form.firstName || !form.lastName) {
-      this.messageService.add({ severity: 'warn', summary: 'Campos requeridos', detail: 'Nombre y apellido son obligatorios.' });
+    if (!form.firstName || !form.lastName || !form.dni || !form.escalaMagisterial) {
+      this.messageService.add({ severity: 'warn', summary: 'Campos requeridos', detail: 'Nombre, apellido, DNI y escala magisterial son obligatorios.' });
       return;
     }
     this.savingEdit.set(true);
@@ -154,6 +204,10 @@ export class AdminUsersComponent implements OnInit {
   }
 
   confirmDelete(user: User): void {
+    if (this.isCurrentUser(user)) {
+      this.messageService.add({ severity: 'warn', summary: 'Acción no permitida', detail: 'No puedes eliminar tu propia cuenta.' });
+      return;
+    }
     this.confirmationService.confirm({
       message: `¿Eliminar al usuario ${user.email}? Esta acción no se puede deshacer.`,
       header: 'Eliminar Usuario',

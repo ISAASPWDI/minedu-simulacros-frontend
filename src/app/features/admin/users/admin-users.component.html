@@ -55,7 +55,9 @@
               [pTooltip]="user.isActive ? 'Desactivar' : 'Activar'"
             ></button>
             <button pButton icon="pi pi-trash" size="small" severity="danger" text
-              pTooltip="Eliminar usuario" (click)="confirmDelete(user)"></button>
+              [disabled]="isCurrentUser(user)"
+              [pTooltip]="isCurrentUser(user) ? 'No puedes eliminar tu propia cuenta' : 'Eliminar usuario'"
+              (click)="confirmDelete(user)"></button>
           </div>
         </td>
       </tr>
@@ -69,7 +71,7 @@
 </div>
 
 <!-- Crear usuario -->
-<p-dialog header="Nuevo Usuario" [visible]="showCreateDialog()" (visibleChange)="showCreateDialog.set($event)" [modal]="true" [style]="{'width':'480px'}" [closable]="!creating()">
+<p-dialog header="Nuevo Usuario" [visible]="showCreateDialog()" (visibleChange)="showCreateDialog.set($event)" [modal]="true" [style]="{'width':'520px'}" [closable]="!creating()">
   <div class="create-form">
     <div class="field-row">
       <div class="field">
@@ -89,6 +91,26 @@
       <label>Contraseña</label>
       <input pInputText type="password" [ngModel]="newUser().password" (ngModelChange)="newUser.update(u => ({...u, password: $event}))" placeholder="Contraseña" class="w-full" />
     </div>
+    <div class="field-row">
+      <div class="field">
+        <label>DNI</label>
+        <input pInputText [ngModel]="newUser().dni" (ngModelChange)="newUser.update(u => ({...u, dni: $event}))" placeholder="12345678" maxlength="8" class="w-full" />
+      </div>
+      <div class="field">
+        <label>Teléfono</label>
+        <input pInputText [ngModel]="newUser().phone" (ngModelChange)="newUser.update(u => ({...u, phone: $event}))" placeholder="987654321" maxlength="9" class="w-full" />
+      </div>
+    </div>
+    <div class="field-row">
+      <div class="field">
+        <label>Escala Magisterial</label>
+        <p-select [ngModel]="newUser().escalaMagisterial" (ngModelChange)="newUser.update(u => ({...u, escalaMagisterial: $event}))" [options]="escalaOptions" placeholder="Selecciona tu escala" styleClass="w-full" appendTo="body" />
+      </div>
+      <div class="field">
+        <label>Especialidad de Interés</label>
+        <p-select [ngModel]="newUser().specialtyInterest" (ngModelChange)="newUser.update(u => ({...u, specialtyInterest: $event}))" [options]="specialtyOptions" placeholder="Selecciona especialidad" styleClass="w-full" appendTo="body" />
+      </div>
+    </div>
     <div class="field">
       <label>Rol</label>
       <p-select [ngModel]="newUser().role" (ngModelChange)="newUser.update(u => ({...u, role: $event}))" [options]="roleOptions" styleClass="w-full" appendTo="body" />
@@ -101,7 +123,7 @@
 </p-dialog>
 
 <!-- Editar usuario -->
-<p-dialog header="Editar Usuario" [visible]="showEditDialog()" (visibleChange)="showEditDialog.set($event)" [modal]="true" [style]="{'width':'420px'}" [closable]="!savingEdit()">
+<p-dialog header="Editar Usuario" [visible]="showEditDialog()" (visibleChange)="showEditDialog.set($event)" [modal]="true" [style]="{'width':'480px'}" [closable]="!savingEdit()">
   @if (editingUser()) {
     <div style="margin-bottom:1rem;font-size:0.9rem;color:var(--text-muted)">
       {{ editingUser()!.email }}
@@ -115,6 +137,26 @@
         <div class="field">
           <label>Apellido</label>
           <input pInputText [ngModel]="editForm().lastName" (ngModelChange)="editForm.update(f => ({...f, lastName: $event}))" placeholder="Apellido" class="w-full" />
+        </div>
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label>DNI</label>
+          <input pInputText [ngModel]="editForm().dni" (ngModelChange)="editForm.update(f => ({...f, dni: $event}))" placeholder="12345678" maxlength="8" class="w-full" />
+        </div>
+        <div class="field">
+          <label>Teléfono</label>
+          <input pInputText [ngModel]="editForm().phone" (ngModelChange)="editForm.update(f => ({...f, phone: $event}))" placeholder="987654321" maxlength="9" class="w-full" />
+        </div>
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label>Escala Magisterial</label>
+          <p-select [ngModel]="editForm().escalaMagisterial" (ngModelChange)="editForm.update(f => ({...f, escalaMagisterial: $event}))" [options]="escalaOptions" placeholder="Selecciona tu escala" styleClass="w-full" appendTo="body" />
+        </div>
+        <div class="field">
+          <label>Especialidad de Interés</label>
+          <p-select [ngModel]="editForm().specialtyInterest" (ngModelChange)="editForm.update(f => ({...f, specialtyInterest: $event}))" [options]="specialtyOptions" placeholder="Selecciona especialidad" styleClass="w-full" appendTo="body" />
         </div>
       </div>
       <div class="field">
