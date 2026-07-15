@@ -137,11 +137,6 @@
         }
       </div>
     </div>
-
-    <ng-template pTemplate="footer">
-      <button pButton label="Cancelar" severity="secondary" text (click)="closeDialog()"></button>
-      <button pButton label="Registrar pedido" icon="pi pi-send" [loading]="creating()" (click)="createOrder()"></button>
-    </ng-template>
   } @else {
     <div class="order-created">
       <i class="pi pi-check-circle"></i>
@@ -149,8 +144,14 @@
       <p>Tu pedido fue enviado. Un administrador confirmará el pago en breve.</p>
       <p class="order-id">ID: {{ createdOrder()!.id }}</p>
     </div>
-    <ng-template pTemplate="footer">
-      <button pButton label="Cerrar" (click)="closeDialog()"></button>
-    </ng-template>
   }
+
+  <ng-template pTemplate="footer">
+    @if (!createdOrder()) {
+      <button pButton label="Cancelar" severity="secondary" text (click)="closeDialog()"></button>
+      <button pButton label="Registrar pedido" icon="pi pi-send" [loading]="creating()" (click)="createOrder()"></button>
+    } @else {
+      <button pButton label="Cerrar" (click)="closeDialog()"></button>
+    }
+  </ng-template>
 </p-dialog>
