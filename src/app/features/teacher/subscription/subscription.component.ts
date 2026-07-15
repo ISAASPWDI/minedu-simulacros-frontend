@@ -9,7 +9,7 @@ import { InputTextModule } from 'primeng/inputtext';
 import { TextareaModule } from 'primeng/textarea';
 import { TableModule } from 'primeng/table';
 import { SkeletonModule } from 'primeng/skeleton';
-import { MessageService } from 'primeng/api';
+import { MessageService, ConfirmationService } from 'primeng/api';
 import { PaymentService } from '../../../core/services/payment.service';
 import { SubscriptionPlan, UserSubscription, PaymentOrder, YapeQrInfo } from '../../../core/models/payment.model';
 import { PageHeaderComponent } from '../../../shared/components/page-header/page-header.component';
@@ -26,6 +26,7 @@ import { PageHeaderComponent } from '../../../shared/components/page-header/page
 export class SubscriptionComponent implements OnInit {
   private paymentService = inject(PaymentService);
   private messageService = inject(MessageService);
+  private confirmationService = inject(ConfirmationService);
 
   plans = signal<SubscriptionPlan[]>([]);
   subscription = signal<UserSubscription | null>(null);
@@ -134,6 +135,17 @@ export class SubscriptionComponent implements OnInit {
   createOrder(): void {
     const plan = this.selectedPlan();
     if (!plan) return;
+    this.confirmationService.confirm({
+      header: 'Confirmar pedido',
+      message: 'Asegúrate de haber realizado el pago por Yape antes de continuar. Un administrador revisará tu comprobante para activar tu plan. ¿Deseas registrar el pedido?',
+      icon: 'pi pi-exclamation-triangle',
+      acceptLabel: 'Sí, registrar pedido',
+      rejectLabel: 'Cancelar',
+      accept: () => this.submitOrder(plan)
+    });
+  }
+
+  private submitOrder(plan: SubscriptionPlan): void {
     this.creating.set(true);
     this.paymentService.createOrder(plan.id, this.payNotes() || undefined, this.payImageUrl() || undefined).subscribe({
       next: (order) => {
