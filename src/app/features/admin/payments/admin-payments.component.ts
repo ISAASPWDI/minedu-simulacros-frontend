@@ -8,7 +8,7 @@ import { ToastModule } from 'primeng/toast';
 import { DialogModule } from 'primeng/dialog';
 import { InputTextModule } from 'primeng/inputtext';
 import { TooltipModule } from 'primeng/tooltip';
-import { MessageService } from 'primeng/api';
+import { MessageService, ConfirmationService } from 'primeng/api';
 import { PaymentService } from '../../../core/services/payment.service';
 import { PaymentOrder } from '../../../core/models/payment.model';
 import { PageHeaderComponent } from '../../../shared/components/page-header/page-header.component';
@@ -24,6 +24,7 @@ import { PageHeaderComponent } from '../../../shared/components/page-header/page
 export class AdminPaymentsComponent implements OnInit {
   private paymentService = inject(PaymentService);
   private messageService = inject(MessageService);
+  private confirmationService = inject(ConfirmationService);
 
   orders = signal<PaymentOrder[]>([]);
   loading = signal(true);
@@ -31,6 +32,7 @@ export class AdminPaymentsComponent implements OnInit {
   pageSize = 10;
   currentPage = 0;
 
+  showDetailDialog = signal(false);
   showConfirmDialog = signal(false);
   showRejectDialog = signal(false);
   selectedOrder = signal<PaymentOrder | null>(null);
@@ -61,6 +63,11 @@ export class AdminPaymentsComponent implements OnInit {
     this.loadOrders();
   }
 
+  openDetail(order: PaymentOrder): void {
+    this.selectedOrder.set(order);
+    this.showDetailDialog.set(true);
+  }
+
   openConfirm(order: PaymentOrder): void {
     this.selectedOrder.set(order);
     this.yapeReference.set('');
@@ -76,6 +83,17 @@ export class AdminPaymentsComponent implements OnInit {
   confirmPayment(): void {
     const order = this.selectedOrder();
     if (!order) return;
+    this.confirmationService.confirm({
+      header: 'Confirmar pago',
+      message: `¿Confirmas el pago de ${order.userName || order.userEmail}? Esto activará su suscripción de inmediato.`,
+      icon: 'pi pi-exclamation-triangle',
+      acceptLabel: 'Sí, confirmar',
+      rejectLabel: 'Cancelar',
+      accept: () => this.doConfirmPayment(order)
+    });
+  }
+
+  private doConfirmPayment(order: PaymentOrder): void {
     this.confirming.set(true);
     this.paymentService.confirmPayment(order.id, this.yapeReference()).subscribe({
       next: () => {
@@ -115,6 +133,18 @@ export class AdminPaymentsComponent implements OnInit {
   rejectPayment(): void {
     const order = this.selectedOrder();
     if (!order) return;
+    this.confirmationService.confirm({
+      header: 'Rechazar pago',
+      message: `¿Rechazas el pago de ${order.userName || order.userEmail}? Se le notificará que reintente el pago.`,
+      icon: 'pi pi-exclamation-triangle',
+      acceptLabel: 'Sí, rechazar',
+      acceptButtonStyleClass: 'p-button-danger',
+      rejectLabel: 'Cancelar',
+      accept: () => this.doRejectPayment(order)
+    });
+  }
+
+  private doRejectPayment(order: PaymentOrder): void {
     this.rejecting.set(true);
     this.paymentService.rejectPayment(order.id, this.rejectImageUrl() ?? undefined).subscribe({
       next: () => {

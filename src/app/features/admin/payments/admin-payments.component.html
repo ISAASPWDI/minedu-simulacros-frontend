@@ -40,12 +40,13 @@
           <p-tag [value]="getStatusLabel(o.status)" [severity]="getStatusSeverity(o.status)" />
         </td>
         <td>
-          @if (o.status === 'PENDING') {
-            <div style="display:flex;gap:4px">
+          <div style="display:flex;gap:4px">
+            <button pButton icon="pi pi-eye" size="small" severity="secondary" text pTooltip="Ver detalles" (click)="openDetail(o)"></button>
+            @if (o.status === 'PENDING') {
               <button pButton icon="pi pi-check" size="small" severity="success" text pTooltip="Confirmar pago" (click)="openConfirm(o)"></button>
               <button pButton icon="pi pi-times" size="small" severity="danger" text pTooltip="Rechazar pago" (click)="openReject(o)"></button>
-            </div>
-          }
+            }
+          </div>
         </td>
       </tr>
     </ng-template>
@@ -56,6 +57,42 @@
     </ng-template>
   </p-table>
 </div>
+
+<!-- Ver detalles -->
+<p-dialog header="Detalle del Pedido" [visible]="showDetailDialog()" (visibleChange)="showDetailDialog.set($event)" [modal]="true" [style]="{'width':'460px'}">
+  @if (selectedOrder()) {
+    <div class="order-summary">
+      <div class="order-user-info">
+        <div class="order-user-name">{{ selectedOrder()!.userName || 'Docente' }}</div>
+        <div class="order-user-email">{{ selectedOrder()!.userEmail }}</div>
+      </div>
+      <div class="order-detail-row"><strong>Fecha:</strong> {{ selectedOrder()!.createdAt | date:'dd/MM/yyyy HH:mm' }}</div>
+      <div class="order-detail-row"><strong>Plan:</strong> {{ selectedOrder()!.planName }}</div>
+      <div class="order-detail-row"><strong>Monto:</strong> S/ {{ selectedOrder()!.amount }}</div>
+      <div class="order-detail-row"><strong>Estado:</strong> <p-tag [value]="getStatusLabel(selectedOrder()!.status)" [severity]="getStatusSeverity(selectedOrder()!.status)" /></div>
+      @if (selectedOrder()!.notes) {
+        <div class="order-detail-row"><strong>Descripción:</strong> {{ selectedOrder()!.notes }}</div>
+      }
+      @if (selectedOrder()!.paymentImageUrl) {
+        <div class="order-detail-row">
+          <strong>Comprobante:</strong>
+          <a [href]="selectedOrder()!.paymentImageUrl!" target="_blank" class="proof-link">
+            <img [src]="selectedOrder()!.paymentImageUrl!" alt="Comprobante" class="proof-thumb" />
+          </a>
+        </div>
+      } @else {
+        <div class="order-detail-row"><strong>Comprobante:</strong> No adjuntado</div>
+      }
+    </div>
+  }
+  <ng-template pTemplate="footer">
+    <button pButton label="Cerrar" severity="secondary" text (click)="showDetailDialog.set(false)"></button>
+    @if (selectedOrder()?.status === 'PENDING') {
+      <button pButton label="Rechazar" icon="pi pi-times" severity="danger" (click)="showDetailDialog.set(false); openReject(selectedOrder()!)"></button>
+      <button pButton label="Confirmar" icon="pi pi-check" severity="success" (click)="showDetailDialog.set(false); openConfirm(selectedOrder()!)"></button>
+    }
+  </ng-template>
+</p-dialog>
 
 <!-- Confirmar pago -->
 <p-dialog header="Confirmar Pago" [visible]="showConfirmDialog()" (visibleChange)="showConfirmDialog.set($event)" [modal]="true" [style]="{'width':'460px'}">
