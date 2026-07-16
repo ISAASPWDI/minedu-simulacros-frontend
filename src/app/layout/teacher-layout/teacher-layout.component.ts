@@ -13,11 +13,12 @@ import { NavigationHistoryService } from '../../core/services/navigation-history
 import { PaymentService } from '../../core/services/payment.service';
 import { UserSubscription } from '../../core/models/payment.model';
 import { User } from '../../core/models/user.model';
+import { NotificationBellComponent } from '../../shared/components/notification-bell/notification-bell.component';
 
 @Component({
   selector: 'app-teacher-layout',
   standalone: true,
-  imports: [CommonModule, RouterModule, ButtonModule, BadgeModule, ToastModule, ConfirmDialogModule, TooltipModule],
+  imports: [CommonModule, RouterModule, ButtonModule, BadgeModule, ToastModule, ConfirmDialogModule, TooltipModule, NotificationBellComponent],
   templateUrl: './teacher-layout.component.html',
   styleUrl: './teacher-layout.component.scss'
 })
@@ -38,7 +39,8 @@ export class TeacherLayoutComponent implements OnInit {
     { label: 'Mis Exámenes', icon: 'pi pi-book', route: '/teacher/exams' },
     { label: 'Mi Historial', icon: 'pi pi-history', route: '/teacher/history' },
     { label: 'Mi Perfil', icon: 'pi pi-user', route: '/teacher/profile' },
-    { label: 'Suscripción', icon: 'pi pi-credit-card', route: '/teacher/subscription' }
+    { label: 'Suscripción', icon: 'pi pi-credit-card', route: '/teacher/subscription' },
+    { label: '¿Necesitas ayuda?', icon: 'pi pi-headphones', route: '/teacher/help' }
   ];
 
   ngOnInit(): void {

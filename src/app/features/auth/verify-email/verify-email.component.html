@@ -1,0 +1,47 @@
+<p-toast />
+
+<div class="login-wrapper">
+  <div class="login-container">
+    <div class="login-card">
+      <div class="login-header">
+        <h1>Verifica tu correo</h1>
+        <p>Enviamos un código de 4 dígitos a {{ email() }}</p>
+        <p class="spam-hint">Si no lo ves en tu bandeja de entrada, revisa también la carpeta de spam.</p>
+      </div>
+
+      <form [formGroup]="form" (ngSubmit)="submit()" class="login-form">
+        <div class="field">
+          <label for="code">Código de verificación</label>
+          <input
+            pInputText
+            id="code"
+            type="text"
+            inputmode="numeric"
+            maxlength="4"
+            formControlName="code"
+            placeholder="0000"
+            class="w-full code-input"
+            [class.ng-invalid]="codeControl?.invalid && codeControl?.touched"
+          />
+          @if (codeControl?.invalid && codeControl?.touched) {
+            <small class="error-msg">Ingresa el código de 4 dígitos</small>
+          }
+        </div>
+
+        <button
+          pButton
+          type="submit"
+          label="Verificar"
+          icon="pi pi-check"
+          class="w-full login-btn"
+          [loading]="loading"
+        ></button>
+      </form>
+
+      <div class="login-footer">
+        <span>¿No recibiste el código?</span>
+        <a class="register-link" (click)="resend()">Reenviar código</a>
+      </div>
+    </div>
+  </div>
+</div>

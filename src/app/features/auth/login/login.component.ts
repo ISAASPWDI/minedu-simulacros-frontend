@@ -61,6 +61,9 @@ export class LoginComponent implements OnInit {
         this.loading = false;
         const msg = err.error?.message || 'Credenciales incorrectas';
         this.messageService.add({ severity: 'error', summary: 'Error', detail: msg });
+        if (/verificar tu correo/i.test(msg)) {
+          setTimeout(() => this.router.navigate(['/auth/verify-email'], { queryParams: { email } }), 1500);
+        }
       }
     });
   }

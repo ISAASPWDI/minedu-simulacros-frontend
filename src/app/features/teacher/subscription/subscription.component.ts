@@ -13,12 +13,13 @@ import { MessageService, ConfirmationService } from 'primeng/api';
 import { PaymentService } from '../../../core/services/payment.service';
 import { SubscriptionPlan, UserSubscription, PaymentOrder, YapeQrInfo } from '../../../core/models/payment.model';
 import { PageHeaderComponent } from '../../../shared/components/page-header/page-header.component';
+import { NotifyAdminButtonComponent } from '../../../shared/components/notify-admin-button/notify-admin-button.component';
 
 @Component({
   selector: 'app-subscription',
   standalone: true,
   imports: [CommonModule, FormsModule, ButtonModule, TagModule, ToastModule, DialogModule,
-    InputTextModule, TextareaModule, TableModule, SkeletonModule, PageHeaderComponent],
+    InputTextModule, TextareaModule, TableModule, SkeletonModule, PageHeaderComponent, NotifyAdminButtonComponent],
   providers: [MessageService],
   templateUrl: './subscription.component.html',
   styleUrl: './subscription.component.scss'

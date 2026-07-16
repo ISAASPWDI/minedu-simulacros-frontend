@@ -80,8 +80,8 @@ export class RegisterComponent {
     this.authService.register(data).subscribe({
       next: () => {
         this.loading = false;
-        this.messageService.add({ severity: 'success', summary: 'Registro exitoso', detail: 'Tu cuenta fue creada. Inicia sesión.' });
-        setTimeout(() => this.router.navigate(['/auth/login']), 2000);
+        this.messageService.add({ severity: 'success', summary: 'Registro exitoso', detail: 'Revisa tu bandeja de entrada o la carpeta de spam para verificar tu cuenta.' });
+        setTimeout(() => this.router.navigate(['/auth/verify-email'], { queryParams: { email: data.email } }), 1500);
       },
       error: (err) => {
         this.loading = false;

@@ -7,6 +7,7 @@ import { TagModule } from 'primeng/tag';
 import { ToastModule } from 'primeng/toast';
 import { DialogModule } from 'primeng/dialog';
 import { InputTextModule } from 'primeng/inputtext';
+import { TextareaModule } from 'primeng/textarea';
 import { TooltipModule } from 'primeng/tooltip';
 import { MessageService, ConfirmationService } from 'primeng/api';
 import { PaymentService } from '../../../../core/services/payment.service';
@@ -15,7 +16,7 @@ import { PaymentOrder } from '../../../../core/models/payment.model';
 @Component({
   selector: 'app-pending-payments-panel',
   standalone: true,
-  imports: [CommonModule, FormsModule, ButtonModule, TableModule, TagModule, ToastModule, DialogModule, InputTextModule, TooltipModule],
+  imports: [CommonModule, FormsModule, ButtonModule, TableModule, TagModule, ToastModule, DialogModule, InputTextModule, TextareaModule, TooltipModule],
   providers: [MessageService],
   templateUrl: './pending-payments-panel.component.html',
   styleUrl: './pending-payments-panel.component.scss'
@@ -45,6 +46,7 @@ export class PendingPaymentsPanelComponent implements OnInit {
   rejecting = signal(false);
   uploadingRejectImage = signal(false);
   rejectImageUrl = signal<string | null>(null);
+  rejectNotes = signal('');
 
   ngOnInit(): void {
     this.loadOrders();
@@ -82,6 +84,7 @@ export class PendingPaymentsPanelComponent implements OnInit {
   openReject(order: PaymentOrder): void {
     this.selectedOrder.set(order);
     this.rejectImageUrl.set(null);
+    this.rejectNotes.set('');
     this.showRejectDialog.set(true);
   }
 
@@ -150,7 +153,7 @@ export class PendingPaymentsPanelComponent implements OnInit {
 
   private doRejectPayment(order: PaymentOrder): void {
     this.rejecting.set(true);
-    this.paymentService.rejectPayment(order.id, this.rejectImageUrl() ?? undefined).subscribe({
+    this.paymentService.rejectPayment(order.id, this.rejectImageUrl() ?? undefined, this.rejectNotes() || undefined).subscribe({
       next: () => {
         this.rejecting.set(false);
         this.showRejectDialog.set(false);

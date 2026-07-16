@@ -5,6 +5,7 @@
     <p>Estamos realizando mejoras en la plataforma. Vuelve a intentarlo en unos minutos.</p>
     <div class="maintenance-actions">
       <button pButton label="Reintentar" icon="pi pi-refresh" [loading]="checking()" (click)="retry()"></button>
+      <app-notify-admin-button label="Notificar al administrador" defaultMessage="El sistema está en mantenimiento y necesito acceder a la plataforma." />
       <button pButton label="Cerrar sesión" icon="pi pi-sign-out" severity="secondary" text (click)="logout()"></button>
     </div>
   </div>

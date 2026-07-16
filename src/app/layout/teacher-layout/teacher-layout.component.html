@@ -44,6 +44,7 @@
       <div class="topbar-brand">Simulacros Docente</div>
       <div class="topbar-spacer"></div>
       <div class="topbar-user">
+        <app-notification-bell />
         @if (subscription()?.isActive) {
           <p-badge [value]="subscription()!.planName" severity="success" styleClass="plan-badge"></p-badge>
         }

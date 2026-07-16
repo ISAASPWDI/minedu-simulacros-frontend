@@ -6,10 +6,6 @@
   background: #e8dfd5;
 }
 
-.login-bg {
-  display: none;
-}
-
 .login-container {
   width: 100%;
   max-width: 420px;
@@ -41,6 +37,12 @@
     font-size: 0.875rem;
     color: #6b6358;
   }
+
+  .spam-hint {
+    font-size: 0.75rem;
+    color: #9a9186;
+    margin-top: 0.5rem;
+  }
 }
 
 .login-form {
@@ -61,21 +63,16 @@
   }
 }
 
+.code-input {
+  text-align: center;
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: 0.5em;
+}
+
 .error-msg {
   color: #c0220c;
   font-size: 0.75rem;
-}
-
-.forgot-link {
-  align-self: flex-end;
-  font-size: 0.8rem;
-  color: #FF5724;
-  text-decoration: none;
-  font-weight: 600;
-
-  &:hover {
-    text-decoration: underline;
-  }
 }
 
 .login-btn {
@@ -99,6 +96,7 @@
     color: #FF5724;
     text-decoration: none;
     font-weight: 600;
+    cursor: pointer;
 
     &:hover {
       text-decoration: underline;

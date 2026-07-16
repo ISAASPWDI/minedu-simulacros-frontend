@@ -20,6 +20,22 @@ export class AuthService {
     return this.http.post(`${environment.apiUrl}/auth/register`, data);
   }
 
+  verifyEmail(email: string, code: string): Observable<any> {
+    return this.http.post(`${environment.apiUrl}/auth/verify-email`, { email, code });
+  }
+
+  resendVerification(email: string): Observable<any> {
+    return this.http.post(`${environment.apiUrl}/auth/resend-verification`, { email });
+  }
+
+  forgotPassword(email: string): Observable<any> {
+    return this.http.post(`${environment.apiUrl}/auth/forgot-password`, { email });
+  }
+
+  resetPassword(email: string, code: string, newPassword: string): Observable<any> {
+    return this.http.post(`${environment.apiUrl}/auth/reset-password`, { email, code, newPassword });
+  }
+
   logout(): void {
     localStorage.removeItem(this.TOKEN_KEY);
     localStorage.removeItem(this.USER_KEY);

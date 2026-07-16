@@ -20,6 +20,7 @@
   <div class="pending-banner">
     <i class="pi pi-clock"></i>
     <span>Tienes un pedido de pago <strong>pendiente</strong>. Espera la confirmación del administrador antes de solicitar otro plan.</span>
+    <app-notify-admin-button label="Notificar al administrador" defaultMessage="Tengo un pedido de pago pendiente y necesito que lo aprueben." />
   </div>
 }
 
@@ -85,6 +86,8 @@
           <td style="font-size:0.85rem;color:var(--text-muted)">
             @if (o.status === 'FAILED' && o.notes) {
               <span style="color:#c0220c">{{ o.notes }}</span>
+            } @else if (o.status === 'COMPLETED' && o.yapeReference) {
+              <span>{{ o.yapeReference }}</span>
             }
           </td>
         </tr>
@@ -118,6 +121,7 @@
         <div class="payments-unavailable">
           <i class="pi pi-info-circle"></i>
           <span>Pagos no están disponibles en este momento. Intenta más tarde o contacta al administrador.</span>
+          <app-notify-admin-button label="Notificar al administrador" defaultMessage="Los pagos no están disponibles y necesito ayuda para completar mi suscripción." />
         </div>
       }
 

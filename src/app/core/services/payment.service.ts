@@ -50,8 +50,8 @@ export class PaymentService {
     return this.http.post<any>(`${this.base}/orders/${orderId}/confirm`, { yapeReference }).pipe(map(r => r.data));
   }
 
-  rejectPayment(orderId: string, rejectionImageUrl?: string): Observable<PaymentOrder> {
-    return this.http.post<any>(`${this.base}/orders/${orderId}/reject`, { rejectionImageUrl: rejectionImageUrl ?? null }).pipe(map(r => r.data));
+  rejectPayment(orderId: string, rejectionImageUrl?: string, notes?: string): Observable<PaymentOrder> {
+    return this.http.post<any>(`${this.base}/orders/${orderId}/reject`, { rejectionImageUrl: rejectionImageUrl ?? null, notes: notes ?? null }).pipe(map(r => r.data));
   }
 
   uploadPaymentImage(file: File): Observable<string> {

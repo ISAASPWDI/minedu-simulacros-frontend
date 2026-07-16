@@ -1,0 +1,44 @@
+<button
+  pButton
+  type="button"
+  icon="pi pi-bell"
+  severity="secondary"
+  text
+  rounded
+  class="bell-btn"
+  (click)="op.toggle($event); onOpen()"
+>
+  @if (unreadCount() > 0) {
+    <span class="unread-badge">{{ unreadCount() > 9 ? '9+' : unreadCount() }}</span>
+  }
+</button>
+
+<p-popover #op>
+  <div class="notif-panel">
+    <div class="notif-header">
+      <span>Notificaciones</span>
+      @if (unreadCount() > 0) {
+        <a class="mark-all-link" (click)="markAllRead()">Marcar todo como leído</a>
+      }
+    </div>
+
+    @if (loading()) {
+      <div class="notif-empty">Cargando...</div>
+    } @else if (notifications().length === 0) {
+      <div class="notif-empty">No tienes notificaciones</div>
+    } @else {
+      <div class="notif-list">
+        @for (notification of notifications(); track notification.id) {
+          <div
+            class="notif-item"
+            [class.unread]="!notification.read"
+            (click)="openNotification(notification)"
+          >
+            <div class="notif-title">{{ notification.title }}</div>
+            <div class="notif-message">{{ notification.message }}</div>
+          </div>
+        }
+      </div>
+    }
+  </div>
+</p-popover>

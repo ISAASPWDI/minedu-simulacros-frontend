@@ -116,8 +116,8 @@
       }
     </div>
     <div class="field mt-3">
-      <label>Referencia interna (opcional)</label>
-      <input pInputText [ngModel]="yapeReference()" (ngModelChange)="yapeReference.set($event)" placeholder="Número de operación..." class="w-full" />
+      <label>Observación (opcional)</label>
+      <input pInputText [ngModel]="yapeReference()" (ngModelChange)="yapeReference.set($event)" placeholder="Escribe una observación para el docente..." class="w-full" />
     </div>
   }
   <ng-template pTemplate="footer">
@@ -138,7 +138,11 @@
     </div>
     <div class="reject-message-box">
       <i class="pi pi-info-circle"></i>
-      <span>El docente recibirá el mensaje: <em>"Tuvimos problemas en recibir el pago, reintente de nuevo"</em></span>
+      <span>Por defecto el docente recibirá el mensaje: <em>"Tuvimos problemas en recibir el pago, reintente de nuevo"</em></span>
+    </div>
+    <div class="field mt-3">
+      <label>Mensaje personalizado (opcional)</label>
+      <textarea pTextarea [ngModel]="rejectNotes()" (ngModelChange)="rejectNotes.set($event)" rows="2" placeholder="Escribe otro mensaje para el docente (opcional)..." class="w-full"></textarea>
     </div>
     <div class="field mt-3">
       <label>Imagen adjunta (opcional)</label>
