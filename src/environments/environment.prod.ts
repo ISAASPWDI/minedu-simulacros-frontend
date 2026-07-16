@@ -1,4 +1,4 @@
 export const environment = {
-  apiUrl: '/api',
+  apiUrl: 'https://minedu-simulacros.duckdns.org/api',
   production: true
 };
